@@ -21,9 +21,9 @@ See [DesignNotes.md](https://github.com/TrustTheVote-Project/VTP-web-api/blob/ma
 
 ## User Story 1
 
-#### What happens when a client (smart device browser of choice) initial connects to the VTP demo
+#### What happens when a client (smart device browser of choice) initially connects to the VTP demo
 
-1. Displays a short welcome and help message that briefly explains the standard contest buttons.  There is only one active button on the page - continue.  Activating that continues to step 2.
+1. Displays a short welcome and help message that briefly explains the standard contest buttons.  There is only one active button on the page, __continue__.  Activating that continues to step 2.
 
 2. Displays the first contest.  At the moment two types of contests are supported, plurality and IRV (RCV).
 
@@ -40,20 +40,21 @@ If IRV/RCV:
 
 Common buttons/actions/UI:
 
-- there is a 'de-select all' button somewhere in the lower left portion of the page
-- there is a 'continue' button somewhere in the lower right portion of the page
+- there is a __de-select all__ button somewhere in the lower left portion of the page
+- there is a __continue__ button somewhere in the lower right portion of the page
   - if the continue button is activated and there is an undervote situation, a warning window appears that allows the user to go to the next contest or stay with the current contest
-- across the top is a horizontal progress bar divided in equals sections by contest
+- across the top is a horizontal progress bar divided into equal width sections by contest
   - each contest is clickable and takes the user to that contest
-  - completed contests are solid bright green, undervote contests are solid somewhat dimm yellow, and no-vote contests are red outlined boxes
-- immediately below the progress bar in the left corner is a 'previous contest' button
-- immediately below the progress bar in the right corner is a next contest' button
-  - when the last contest in focus, the upper right button says 'checkout'
-- when the checkout box is clicked, all the contests are displayed with only two buttons: go-back and this-is-my-vote
-  - go-back goes to the previous page with the checkout box in the upper right
-  - this-is-my-vote submits the ballot
+    - if there is an undervote in the current contest, a proceed-able warning window appears
+  - in the completion bar, completed contests are solid bright green, undervote contests are solid somewhat dimm yellow, and no-vote or undervote contests that are to the left of any green or yellow contest are red outlined boxes.
+- immediately below the progress bar in the left corner is a __previous contest__ button
+- immediately below the progress bar in the right corner is a __next contest__ button
+  - when the last contest in focus, the upper right button says __checkout__
+- when the __checkout__ box is clicked, all the contests are displayed with only two buttons: __go-back__ and __this-is-my-vote__
+  - __go-back__ goes to the previous page with the checkout box in the upper right
+  - __this-is-my-vote__ submits the ballot
 
-Note that the backend python server side will re-validate the incoming ballot CVR.  The this-is-my-vote entrypoint can return various errors to the user:
+Note that the backend python server side will re-validate the incoming ballot CVR.  The __this-is-my-vote__ entrypoint can return various errors to the user:
 
 - a non compliant contest selection was found
 - there was a problem on the server side
@@ -63,8 +64,8 @@ If there is no error, the endpoint returns:
 - the voter's ballot check as if it were paper (no links) but with the QR code being a valid link (into the voter's backend server's still active git workspace)
 - the voter's row offset into the ballot check is temporarily displayed
 - in addition there is, for demo purposes only, two additional buttons on this page
-  - a verify-ballot-receipt button
-  - a tally-contests button
+  - a __verify-ballot-receipt__ button
+  - a __tally-contests__ button
 
 ## User Story 2
 
@@ -76,14 +77,14 @@ Displays the git repo copy of the contents of the ballot check.  All the digests
 
 #### What happens when the user wants to verify their ballot check?
 
-The user clicks the verify-ballot-receipt (end of User Story 1) and a new page displays the 'console log' output of that function with digests hyperlinked.  The output page contains a few by default blank fields that the user can optionally fill in.  One of them is a row offset.
+The user clicks the __verify ballot receipt__ (end of User Story 1) and a new page displays the 'console log' output of that function with digests hyperlinked.  The output page contains a few by default blank fields that the user can optionally fill in.  One of them is a row offset.
 
-The page contains a re-verify button that re-verifies the receipt honoring the new values in the various fields.
+The page contains a __re-verify__ button that re-verifies the receipt honoring the new values in the various fields.
 
 ## User Story 4
 
 #### What happens when the user wants to tally the election
 
-The user clicks the tally-contests button (end of User Story 1) and a new page displays the 'console log' output of that function with digests hyperlinked.  The output page contains a few by default blank fields that the user can optionally fill in.  One of them is a row offset.
+The user clicks the __tally contests__ button (end of User Story 1) and a new page displays the 'console log' output of that function with digests hyperlinked.  The output page contains a few by default blank fields that the user can optionally fill in.  One of them is a row offset.
 
-The page contains a re-tally button that re-tallies the election honoring the new values in the various fields.
+The page contains a __re-tally contests__ button that re-tallies the election honoring the new values in the various fields.
