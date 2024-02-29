@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="stylesheets/voting.css">
+        <script src="blank-ballot.js"></script>
+        <title>Voting - User Story 2</title>
+        <style>
+        /* box debugging
+         * {
+	   border-style: solid;
+	   border-color: red;
+           }
+         */
+        </style>
+    </head>
+    <body>
+        <!--
+             Note - each contest is effectively a separate page.  The contest next button (there
+             are several ways to get to the next, previous, or random other contest) resets
+             the two lists to the current state of the (new) contest.
+
+             Note that contests can be in one of three states: un-voted, undervoted, or
+             voted.  The progress bar is divided into the contest number of sections, each
+             section from left to rigth representing a contest.  The coloring is as follows:
+
+             green     -> voted (completed)
+             yellow    -> undervoted
+             red       -> there are two cases when a progress bar section is red: a) when the
+                          contest is unvoted when there is a yellow or green contest to the
+                          right, or b) when the voter is on the checkout/cast-vote final page
+             uncolored -> unvoted when there are no yellows/greens to the right and when the
+                          voter is not on the final checkout/cast page
+
+             For now, just stub out five contests and pretend this is the first one being
+             being revisted after skipping the first two and completing the third one
+        -->
+        <div id="progressBar"></div>
+        <div id="youAreHereBar"></div>
+
+        <p>Progress bar per contest and current contest</p>
+
+        <!-- The upper span starts here
+             Note - when exiting a contest page, all child nodes of upperSection
+             will be wiped out.
+        -->
+        <div id="upperSection"></div>
+
+        <!-- The lower span start here.
+             Note - when exiting a contest page, all child nodes of lowerSection
+             will be wiped out.
+        -->
+        <div id="lowerSection"></div>
+
+        <!-- The bottom span start here.
+             Nominally this is where the bottom buttons gp
+        -->
+        <div id="bottomSection"></div>
+
+        <!-- -->
+        <!-- html ends, javascript starts -->
+        <!-- -->
+        <script>
+
+        // Need the JSON data for just about everything
+        // Create the blankBallot javascript object from the blankBallotJSON JSON object literal
+        var blankBallot = null;
+        try {
+            blankBallot = JSON.parse(blankBallotJSON);
+        } catch (e) {
+            console.error(e);
+        }
+
+        // Note - for the moment let these be globals (until we know more).
+        // Regardless, the upper/lower setup will make sure choiceList and
+        // sortableList are already defined.
+        var choiceList = null;
+        var sortableList = null;
+        var removeButtons = null;
+
+        // Odds and ends
+        const selectBackgroundColor = "#f5f5f5";
+
+        // Get the number of contests which is actually ordered/subdivided by GGO
+        const listOfContests = [];
+        function _initialize() {
+            let count = 0;
+            for (const ggo of blankBallot.active_ggos) {
+                if (blankBallot.contests[ggo]) {
+                    for (const contest of blankBallot.contests[ggo]) {
+                        listOfContests[count] = contest;
+                        count += 1;
+                    }
+                }
+            }
+            return count;
+        }
+        const numberOfContests = _initialize();
+        console.log("there are " + numberOfContests + " contest(s)");
+
+        // Define a YouAreThere inline glyph
+        const yrhIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        yrhIcon.setAttribute("width", "18");
+        yrhIcon.setAttribute("height", "18");
+        yrhIcon.setAttribute("viewBox", "0 0 32 32");
+        yrhIcon.setAttribute("fill", "currentColor");
+        yrhIcon.innerHTML = `<path d="M26.221 16c0-7.243-5.871-13.113-13.113-13.113s-13.113 5.87-13.113 13.113c0 7.242 5.871 13.113 13.113 13.113s13.113-5.871 13.113-13.113zM1.045 16c0-6.652 5.412-12.064 12.064-12.064s12.064 5.412 12.064 12.064c0 6.652-5.411 12.064-12.064 12.064-6.652 0-12.064-5.412-12.064-12.064z"></path><path d="M18.746 15.204l0.742-0.742-6.379-6.379-6.378 6.379 0.742 0.742 5.112-5.112v12.727h1.049v-12.727z"></path>`;
+
+        // Will set up the progress bars with numberOfContests contests
+        function setupProgressBars(numberOfContests) {
+            const progBarElement = document.getElementById("progressBar");
+            const yrhBarElement = document.getElementById("youAreHereBar");
+            for (let contest = 0; contest < numberOfContests; contest++) {
+                const id = contest + 1;
+                // progress bar
+                const newBarElement = document.createElement("div");
+                newBarElement.setAttribute("class", "progSection");
+                newBarElement.setAttribute("id", "progBar" + contest);
+                newBarElement.innerHTML = id;
+                progBarElement.appendChild(newBarElement);
+                // youAreHereBar bar
+                const newYrhElement = document.createElement("div");
+                newYrhElement.setAttribute("class", "yrhSection");
+                newYrhElement.setAttribute("id", "yrhBar" + contest);
+                yrhBarElement.appendChild(newYrhElement);
+            }
+            // Add a final checkout section
+            const newBarElement = document.createElement("div");
+            // Note - the last progress bar section wants to the same class
+            // as the other so not to have any borders
+            newBarElement.setAttribute("class", "yrhSection");
+            newBarElement.setAttribute("id", "progBar" + (numberOfContests + 1));
+            newBarElement.innerHTML = "checkout";
+            progBarElement.appendChild(newBarElement);
+            const newYrhElement = document.createElement("div");
+            newYrhElement.setAttribute("class", "yrhSection");
+            newYrhElement.setAttribute("id", "yrhBar" + (numberOfContests + 1));
+            yrhBarElement.appendChild(newYrhElement);
+        }
+
+        // Will set the color of the progress bar (per contest)
+        function setProgressBarColor(contestNum, color) {
+            const sectionElement = document.getElementById("progBar" + contestNum);
+            sectionElement.style.backgroundColor = color;
+        }
+
+        // Will set the contents of the youAreHereBar bar (per contest)
+        function setActiveContest(contestNum) {
+            const sectionElement = document.getElementById("yrhBar" + contestNum);
+            const newElement = document.createElement("span");
+            newElement.appendChild(yrhIcon);
+            sectionElement.appendChild(newElement);
+        }
+
+        // Will set up the upperSection
+        function setUpperSection(contestType, maxSelection) {
+            const rootElement = document.getElementById("upperSection");
+            const newItem = document.createElement("span");
+            if (contestType == "plurality") {
+                let innerText = "<h2>A plurality contest:</h2><ul><li>Make you selection by clicking.  Click again to unselect.</li>";
+                if (maxSelection == 1) {
+                    innerText += "<li>You can only make one selection</li></ul>";
+                } else {
+                    innerText += "<li>You can choose upto " + maxSelection + "</li></ul>";
+                }
+                newItem.innerHTML = innerText;
+            } else {
+                innerText = `<h2>A RCV (IRV) contest:</h2>
+                <ul>
+                <li>Clicking a candidate will add it to your RCV</li>
+                <li>Your RCV selection is re-orderable by drag-and-drop</li>
+                <li>Clicking a selection's remove button un-selects a candidate</li>
+                </ul>
+                <h2>Your RCV selection:</h2>
+                `;
+                newItem.innerHTML = innerText;
+            }
+            const newList = document.createElement("ol");
+            newList.setAttribute("id", "sortableList");
+            newItem.appendChild(newList);
+            rootElement.appendChild(newItem);
+        }
+
+        // Will set up the lowerSection
+        function setLowerSection(choiceType) {
+            const rootElement = document.getElementById("lowerSection");
+            const newItem = document.createElement("span");
+            if (choiceType == "ticket") {
+                newItem.innerHTML = "<h2>Candidates:</h2>";
+            } else if (choiceType == "question") {
+                newItem.innerHTML = "<h2>Your selection:</h2>";
+            } else {
+                newItem.innerHTML = "<h2>Candidates:</h2>";
+            }
+            const newList = document.createElement("ul");
+            newList.setAttribute("id", "choiceList");
+            newItem.appendChild(newList);
+            rootElement.appendChild(newItem);
+        }
+
+        // Setup the choiceList
+        function setupChoiceList(choices, choiceType, ticketTitles) {
+            const rootElement = document.getElementById("choiceList");
+            for (let choice of choices) {
+                const newItem = document.createElement("li");
+                newItem.classList.add("flex-item"); // Apply a class for styling
+
+                // Create a selection glyph
+                const svgIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                svgIcon.setAttribute("width", "16");
+                svgIcon.setAttribute("height", "16");
+                svgIcon.setAttribute("viewBox", "0 0 16 16");
+                svgIcon.setAttribute("fill", selectBackgroundColor);
+                svgIcon.innerHTML = '<circle r=6 cx=8 cy=8 stroke="black" stroke-width="1"/>';
+
+                // Create the text element
+                const textElement = document.createElement("span");
+                textElement.textContent = choice.name;
+                if (choiceType == "ticket") {
+                    // Note - need to add this as an additional flex-box
+                    // so that the 'name' matches the choice
+                    let addendum = [];
+                    for (let office of ticketTitles) {
+                        addendum.push(office + ":" + choice.ticket_names);
+                    }
+                    textElement.textContent += "[" + addendum.join(", ") + "]";
+                }
+                // Add the unselected class
+                newItem.classList.add("unselected");
+
+                // Append everything ...
+                newItem.appendChild(svgIcon);
+                newItem.appendChild(textElement);
+                rootElement.appendChild(newItem);
+            }
+        }
+
+        // Make the RCV selection sortable by drag-and-drop
+        function initSortableList(target) {
+            target.classList.add("slist");
+            const items = target.getElementsByTagName("li");
+            let current = null;
+
+            for (let i of items) {
+                i.draggable = true;
+
+                i.ondragstart = (e) => {
+                    current = i;
+                    for (let it of items) {
+                        if (it != current) {
+                            it.classList.add("hint");
+                        }
+                    }
+                };
+
+                i.ondragenter = (e) => {
+                    if (i != current) {
+                        i.classList.add("active");
+                    }
+                };
+
+                i.ondragleave = (e) => {
+                    i.classList.remove("active");
+                };
+
+                i.ondragend = (e) => {
+                    for (let it of items) {
+                        it.classList.remove("hint");
+                        it.classList.remove("active");
+                    }
+                };
+
+                i.ondragover = (e) => e.preventDefault();
+
+                i.ondrop = (e) => {
+                    if (i != current) {
+                        let currentPos = 0;
+                        let droppedPos = 0;
+
+                        for (let it = 0; it < items.length; it++) {
+                            if (current == items[it]) {
+                                currentPos = it;
+                            }
+                            if (i == items[it]) {
+                                droppedPos = it;
+                            }
+                        }
+
+                        if (currentPos < droppedPos) {
+                            i.parentNode.insertBefore(current, i.nextSibling);
+                        } else {
+                            i.parentNode.insertBefore(current, i);
+                        }
+                    }
+                };
+            }
+        }
+
+        // RCV event listeners
+        function setupRCVEventListeners(maxCount) {
+            console.log("Running setupRCVEventListeners:");
+            // Event listener for selection in the first list (when a candidate is selected)
+            console.log("Running setupRCVEventListeners:");
+            choiceList.addEventListener("click", (event) => {
+                if (event.target.tagName === "LI") {
+                    // Create a new selected item with a remove button
+                    const selectedText = event.target.textContent;
+                    const newItem = document.createElement("li");
+                    newItem.classList.add("flex-item"); // Apply a class for styling
+
+                    // Create a remove button
+                    const newButton = document.createElement("button");
+                    newButton.innerText = "remove";
+                    newButton.classList.add("remove");
+                    // add an event listener to the button
+                    newButton.addEventListener("click", function (e) {
+                        console.log("Running RCV eventListener:");
+                        var itemName = e.target.parentNode.textContent.trim().replace(/ remove$/, "");;
+                        console.log("removing:", itemName);
+                        // remove it from sortableList
+                        e.target.parentNode.remove();
+                        // add to choiceList
+                        const listItem = document.createElement("li");
+                        listItem.textContent = itemName;
+                        choiceList.appendChild(listItem);
+                    });
+
+                    // Create a re-order glyph
+                    const svgIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                    svgIcon.setAttribute("width", "20");
+                    svgIcon.setAttribute("height", "20");
+                    svgIcon.setAttribute("viewBox", "0 -4 16 16");
+                    // svgIcon.setAttribute("preserveAspectRatio", "xMidYMid meet");
+                    svgIcon.setAttribute("fill", "currentColor");
+                    svgIcon.setAttribute("fill-rule", "evenodd");
+                    svgIcon.setAttribute("clip-rule", "evenodd");
+                    // the actual svg
+                    svgIcon.innerHTML = `<path d="M2.49998 4.09998C2.27906 4.09998 2.09998 4.27906 2.09998 4.49998C2.09998 4.72089 2.27906 4.89998 2.49998 4.89998H12.5C12.7209 4.89998 12.9 4.72089 12.9 4.49998C12.9 4.27906 12.7209 4.09998 12.5 4.09998H2.49998ZM2.49998 6.09998C2.27906 6.09998 2.09998 6.27906 2.09998 6.49998C2.09998 6.72089 2.27906 6.89998 2.49998 6.89998H12.5C12.7209 6.89998 12.9 6.72089 12.9 6.49998C12.9 6.27906 12.7209 6.09998 12.5 6.09998H2.49998ZM2.09998 8.49998C2.09998 8.27906 2.27906 8.09998 2.49998 8.09998H12.5C12.7209 8.09998 12.9 8.27906 12.9 8.49998C12.9 8.72089 12.7209 8.89998 12.5 8.89998H2.49998C2.27906 8.89998 2.09998 8.72089 2.09998 8.49998ZM2.49998 10.1C2.27906 10.1 2.09998 10.2791 2.09998 10.5C2.09998 10.7209 2.27906 10.9 2.49998 10.9H12.5C12.7209 10.9 12.9 10.7209 12.9 10.5C12.9 10.2791 12.7209 10.1 12.5 10.1H2.49998Z"/>`;
+
+                    // Create the text element
+                    const textElement = document.createElement("span");
+                    textElement.textContent = selectedText + "  ";
+
+                    // Append everything ...
+                    newItem.appendChild(svgIcon);
+                    newItem.appendChild(textElement);
+                    newItem.appendChild(newButton);
+                    // ... and append that to the bottom of sortableList
+                    sortableList.appendChild(newItem);
+
+                    // Remove the selected item from the first list
+                    event.target.remove();
+
+                    // Initialize the sortable list
+                    initSortableList(document.getElementById("sortableList"));
+                }
+            });
+        }
+
+        // plurality event listeners
+        function setupPluralityEventListeners(maxCount) {
+            console.log("Running setupPluralityEventListeners:");
+            let selectedCount = 0;
+            choiceList.addEventListener("click", (event) => {
+                console.log("Running plurality eventListener:");
+                const listItem = event.target;
+                const itemText = listItem.textContent;
+                const itemIndex = Array.from(choiceList.children).indexOf(listItem);
+                if (listItem.tagName === "LI") {
+                    if (listItem.classList.contains("selected")) {
+                        // Deselect the item
+                        listItem.classList.add("unselected");
+                        listItem.classList.remove("selected");
+                        listItem.firstElementChild.style.fill = selectBackgroundColor;
+                        selectedCount--;
+                        // get the svg (first child) and set fill to off
+                        console.log("de-selected " + itemIndex + ", " + itemText);
+                    } else if (selectedCount < maxCount) {
+                        // Select the item (up to maxSelection selections allowed)
+                        listItem.classList.add("selected");
+                        listItem.classList.remove("unselected");
+                        // get the svg (first child) and set fill to on (black)
+                        listItem.firstElementChild.style.fill = "black"
+                        selectedCount++;
+                        console.log("selected " + itemIndex + ", " + itemText);
+                    } else {
+                        // Overvote
+                        console.log("rejected (overvote) - ignoring " + itemIndex + ", " + itemText);
+                    }
+                }
+            });
+        }
+
+        // the next/checkout button listener
+        function setupNextButtonListener(buttonString, nextContest) {
+            console.log("Running setupNextButtonListener: '" + buttonString + "' button to contest " + nextContest);
+            const bottomElement = document.getElementById("bottomSection");
+            const newList = document.createElement("ul");
+            newList.classList.add("flex-item"); // Apply a class for styling
+            newList.classList.add("noBullets");
+            const newItem = document.createElement("li");
+            // Create a next/checkout button
+            const newButton = document.createElement("button");
+            newButton.innerText = buttonString;
+            // add an event listener to the button
+            newButton.addEventListener("click", function (e) {
+                console.log("Running '" + buttonString + "' button eventListener: contest " + nextContest);
+                // On the button click go to the next contest or the checkout screen
+                //
+                // Going to the next contest involves:
+                // 1) capturing the vote (a.k.a. thisContest's selections)
+                // 2) clearing out the upper and lower node DOM trees
+                document.getElementById("upperSection").replaceChildren();
+                document.getElementById("lowerSection").replaceChildren();
+                document.getElementById("bottomSection").replaceChildren();
+                if (nextContest < numberOfContests) {
+                    // 3a) go to next contest
+                    setupNewContest(nextContest);
+                } else {
+                    // 3b) go to checkout
+                    setupCheckout();
+                }
+            });
+            // Add to the DOM
+            newList.appendChild(newButton);
+            bottomElement.appendChild(newList);
+        }
+
+        // Setup the checkout
+        function setupCheckout() {
+            console.log("setupCheckout: setting up checkout page");
+        }
+
+        // Setup a new contest
+        function setupNewContest(thisContest) {
+            console.log("Running setupNewContest: contest " + thisContest);
+            let nextContest = thisContest + 1;
+            let thisContestName = Object.keys(listOfContests[thisContest])[0];
+            let thisContestValue = Object.values(listOfContests[thisContest])[0];
+
+            // and initialize them
+            setProgressBarColor(thisContest, "#D5F5E3");
+            setActiveContest(thisContest);
+
+            // Setup the upper and lower sections
+            let contestType = thisContestValue.tally;
+            let choiceType = thisContestValue.contest_type;
+            setUpperSection(contestType, thisContestValue.max);
+            setLowerSection(choiceType);
+
+            // Note - for the moment let these be globals (until we know more).
+            // Regardless, the upper/lower setup will make sure choiceList and
+            // sortableList are already defined.
+            choiceList = document.getElementById("choiceList");
+            sortableList = document.getElementById("sortableList");
+            removeButtons = document.getElementsByClassName("remove");
+
+            // Setup the choiceList
+            setupChoiceList(thisContestValue.choices, choiceType, thisContestValue.ticket_offices);
+            if (contestType == "plurality") {
+                setupPluralityEventListeners(thisContestValue.max);
+            } else {
+                setupRCVEventListeners(thisContestValue.max);
+            }
+
+            // Setup the bottomSection - this supplies simply "next context/checkout"
+            // navigation
+            setupNextButtonListener("Next contest (" + nextContest + ")", nextContest);
+        }
+
+        // If here, this is the first contest
+        // set up the bars once
+        setupProgressBars(numberOfContests);
+        // set up the first contest
+        setupNewContest(0);
+
+        </script>
+    </body>
+</html>
