@@ -154,19 +154,20 @@
         }
 
         // Will set up the upperSection
-        function setUpperSection(contestType, maxSelection) {
+        function setUpperSection(thisContestName, thisContestValue) {
             const rootElement = document.getElementById("upperSection");
             const newItem = document.createElement("span");
-            if (contestType == "plurality") {
-                let innerText = "<h2>A plurality contest:</h2><ul><li>Make you selection by clicking.  Click again to unselect.</li>";
-                if (maxSelection == 1) {
+            const max = thisContestValue.max;
+            if (thisContestValue.tally == "plurality") {
+                let innerText = "<h2>" + thisContestName + "</h2><h3>A plurality contest:</h3><ul><li>Make you selection by clicking.  Click again to unselect.</li>";
+                if (max == 1) {
                     innerText += "<li>You can only make one selection</li></ul>";
                 } else {
-                    innerText += "<li>You can choose upto " + maxSelection + "</li></ul>";
+                    innerText += "<li>You can choose upto " + max + "</li></ul>";
                 }
                 newItem.innerHTML = innerText;
             } else {
-                innerText = `<h2>A RCV (IRV) contest:</h2>
+                innerText = "<h2>" + thisContestName + `</h2><h3> RCV (IRV) contest:</h3>
                 <ul>
                 <li>Clicking a candidate will add it to your RCV</li>
                 <li>Your RCV selection is re-orderable by drag-and-drop</li>
@@ -183,12 +184,12 @@
         }
 
         // Will set up the lowerSection
-        function setLowerSection(choiceType) {
+        function setLowerSection(thisContestValue) {
             const rootElement = document.getElementById("lowerSection");
             const newItem = document.createElement("span");
-            if (choiceType == "ticket") {
-                newItem.innerHTML = "<h2>Candidates:</h2>";
-            } else if (choiceType == "question") {
+            if (thisContestValue.contest_type == "ticket") {
+                newItem.innerHTML = "<h3>Candidates:</h3>";
+            } else if (thisContestValue.contest_type == "question") {
                 newItem.innerHTML = "<h2>Your selection:</h2>";
             } else {
                 newItem.innerHTML = "<h2>Candidates:</h2>";
@@ -200,9 +201,12 @@
         }
 
         // Setup the choiceList
-        function setupChoiceList(choices, choiceType, ticketTitles) {
+        function setupChoiceList(thisContestName, thisContestValue, overrideChoice=null) {
             const rootElement = document.getElementById("choiceList");
-            for (let choice of choices) {
+            for (let choice of thisContestValue.choices) {
+                if (overrideChoice) {
+                    choice = overrideChoice;
+                }
                 const newItem = document.createElement("li");
                 newItem.classList.add("flex-item"); // Apply a class for styling
 
@@ -216,12 +220,18 @@
 
                 // Create the text element
                 const textElement = document.createElement("span");
-                textElement.textContent = choice.name;
-                if (choiceType == "ticket") {
+                // Ugh - need to inspect for the choices data type
+                if (choice.name) {
+                    textElement.textContent = choice.name;
+                } else {
+                    // Just an array of strings
+                    textElement.textContent = choice;
+                }
+                if (thisContestValue.contest_type == "ticket") {
                     // Note - need to add this as an additional flex-box
                     // so that the 'name' matches the choice
                     let addendum = [];
-                    for (let office of ticketTitles) {
+                    for (let office of thisContestValue.ticket_offices) {
                         addendum.push(office + ":" + choice.ticket_names);
                     }
                     textElement.textContent += "[" + addendum.join(", ") + "]";
@@ -233,6 +243,10 @@
                 newItem.appendChild(svgIcon);
                 newItem.appendChild(textElement);
                 rootElement.appendChild(newItem);
+
+                if (overrideChoice) {
+                    break;
+                }
             }
         }
 
@@ -298,7 +312,7 @@
         }
 
         // RCV event listeners
-        function setupRCVEventListeners(maxCount) {
+        function setupRCVEventListeners(thisContestName, thisContestValue) {
             console.log("Running setupRCVEventListeners:");
             // Event listener for selection in the first list (when a candidate is selected)
             console.log("Running setupRCVEventListeners:");
@@ -316,14 +330,12 @@
                     // add an event listener to the button
                     newButton.addEventListener("click", function (e) {
                         console.log("Running RCV eventListener:");
-                        var itemName = e.target.parentNode.textContent.trim().replace(/ remove$/, "");;
+                        let itemName = e.target.parentNode.textContent.trim().replace(/ remove$/, "");
                         console.log("removing:", itemName);
                         // remove it from sortableList
                         e.target.parentNode.remove();
                         // add to choiceList
-                        const listItem = document.createElement("li");
-                        listItem.textContent = itemName;
-                        choiceList.appendChild(listItem);
+                        setupChoiceList(thisContestName, thisContestValue, itemName);
                     });
 
                     // Create a re-order glyph
@@ -359,7 +371,7 @@
         }
 
         // plurality event listeners
-        function setupPluralityEventListeners(maxCount) {
+        function setupPluralityEventListeners(thisContestName, thisContestValue) {
             console.log("Running setupPluralityEventListeners:");
             let selectedCount = 0;
             choiceList.addEventListener("click", (event) => {
@@ -376,7 +388,7 @@
                         selectedCount--;
                         // get the svg (first child) and set fill to off
                         console.log("de-selected " + itemIndex + ", " + itemText);
-                    } else if (selectedCount < maxCount) {
+                    } else if (selectedCount < thisContestValue.max) {
                         // Select the item (up to maxSelection selections allowed)
                         listItem.classList.add("selected");
                         listItem.classList.remove("unselected");
@@ -444,10 +456,8 @@
             setActiveContest(thisContest);
 
             // Setup the upper and lower sections
-            let contestType = thisContestValue.tally;
-            let choiceType = thisContestValue.contest_type;
-            setUpperSection(contestType, thisContestValue.max);
-            setLowerSection(choiceType);
+            setUpperSection(thisContestName, thisContestValue);
+            setLowerSection(thisContestValue);
 
             // Note - for the moment let these be globals (until we know more).
             // Regardless, the upper/lower setup will make sure choiceList and
@@ -457,11 +467,11 @@
             removeButtons = document.getElementsByClassName("remove");
 
             // Setup the choiceList
-            setupChoiceList(thisContestValue.choices, choiceType, thisContestValue.ticket_offices);
-            if (contestType == "plurality") {
-                setupPluralityEventListeners(thisContestValue.max);
+            setupChoiceList(thisContestName, thisContestValue);
+            if (thisContestValue.tally == "plurality") {
+                setupPluralityEventListeners(thisContestName, thisContestValue);
             } else {
-                setupRCVEventListeners(thisContestValue.max);
+                setupRCVEventListeners(thisContestName, thisContestValue);
             }
 
             // Setup the bottomSection - this supplies simply "next context/checkout"
