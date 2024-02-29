@@ -190,9 +190,9 @@
             if (thisContestValue.contest_type == "ticket") {
                 newItem.innerHTML = "<h3>Candidates:</h3>";
             } else if (thisContestValue.contest_type == "question") {
-                newItem.innerHTML = "<h2>Your selection:</h2>";
+                newItem.innerHTML = "<h3>Your selection:</h3>";
             } else {
-                newItem.innerHTML = "<h2>Candidates:</h2>";
+                newItem.innerHTML = "<h3>Candidates:</h3>";
             }
             const newList = document.createElement("ul");
             newList.setAttribute("id", "choiceList");
@@ -222,10 +222,10 @@
                 const textElement = document.createElement("span");
                 // Ugh - need to inspect for the choices data type
                 if (choice.name) {
-                    textElement.textContent = choice.name;
+                    textElement.innerHTML = "&nbsp&nbsp" + choice.name;
                 } else {
                     // Just an array of strings
-                    textElement.textContent = choice;
+                    textElement.innerHTML = "&nbsp&nbsp" + choice;
                 }
                 if (thisContestValue.contest_type == "ticket") {
                     // Note - need to add this as an additional flex-box
@@ -234,7 +234,7 @@
                     for (let office of thisContestValue.ticket_offices) {
                         addendum.push(office + ":" + choice.ticket_names);
                     }
-                    textElement.textContent += "[" + addendum.join(", ") + "]";
+                    textElement.innerHTML += "&nbsp&nbsp[" + addendum.join(", ") + "]";
                 }
                 // Add the unselected class
                 newItem.classList.add("unselected");
@@ -330,7 +330,7 @@
                     // add an event listener to the button
                     newButton.addEventListener("click", function (e) {
                         console.log("Running RCV eventListener:");
-                        let itemName = e.target.parentNode.textContent.trim().replace(/ remove$/, "");
+                        let itemName = e.target.parentNode.textContent.trim().replace(/\sremove$/, "");
                         console.log("removing:", itemName);
                         // remove it from sortableList
                         e.target.parentNode.remove();
@@ -352,7 +352,7 @@
 
                     // Create the text element
                     const textElement = document.createElement("span");
-                    textElement.textContent = selectedText + "  ";
+                    textElement.innerHTML = selectedText + "&nbsp&nbsp";
 
                     // Append everything ...
                     newItem.appendChild(svgIcon);
