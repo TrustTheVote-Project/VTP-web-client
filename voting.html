@@ -219,13 +219,14 @@
                 svgIcon.innerHTML = '<circle r=6 cx=8 cy=8 stroke="black" stroke-width="1"/>';
 
                 // Create the text element
-                const textElement = document.createElement("span");
+                const name = document.createElement("span");
+                const extraText = document.createElement("span");
                 // Ugh - need to inspect for the choices data type
                 if (choice.name) {
-                    textElement.innerHTML = "&nbsp&nbsp" + choice.name;
+                    name.innerHTML = "&nbsp&nbsp" + choice.name;
                 } else {
                     // Just an array of strings
-                    textElement.innerHTML = "&nbsp&nbsp" + choice;
+                    name.innerHTML = "&nbsp&nbsp" + choice;
                 }
                 if (thisContestValue.contest_type == "ticket") {
                     // Note - need to add this as an additional flex-box
@@ -234,14 +235,15 @@
                     for (let office of thisContestValue.ticket_offices) {
                         addendum.push(office + ":" + choice.ticket_names);
                     }
-                    textElement.innerHTML += "&nbsp&nbsp[" + addendum.join(", ") + "]";
+                    extraText.innerHTML = "&nbsp&nbsp[" + addendum.join(", ") + "]";
                 }
                 // Add the unselected class
                 newItem.classList.add("unselected");
 
                 // Append everything ...
                 newItem.appendChild(svgIcon);
-                newItem.appendChild(textElement);
+                newItem.appendChild(name);
+                newItem.appendChild(extraText);
                 rootElement.appendChild(newItem);
 
                 if (overrideChoice) {
@@ -315,7 +317,6 @@
         function setupRCVEventListeners(thisContestName, thisContestValue) {
             console.log("Running setupRCVEventListeners:");
             // Event listener for selection in the first list (when a candidate is selected)
-            console.log("Running setupRCVEventListeners:");
             choiceList.addEventListener("click", (event) => {
                 if (event.target.tagName === "LI") {
                     // Create a new selected item with a remove button
@@ -405,7 +406,7 @@
         }
 
         // the next/checkout button listener
-        function setupNextButtonListener(buttonString, nextContest) {
+        function setupNextButtonListener(buttonString, nextContest, thisContestValue) {
             console.log("Running setupNextButtonListener: '" + buttonString + "' button to contest " + nextContest);
             const bottomElement = document.getElementById("bottomSection");
             const newList = document.createElement("ul");
@@ -421,7 +422,18 @@
                 // On the button click go to the next contest or the checkout screen
                 //
                 // Going to the next contest involves:
-                // 1) capturing the vote (a.k.a. thisContest's selections)
+                // 1) capturing the vote (a.k.a. thisContest's selections) before it
+                //    (probably?) gets wiped out when the DOM children are reaped
+                if (thisContestValue) {
+                    const selection = [];
+                    let index = 0;
+                    for (const choice of document.getElementsByClassName("selected")) {
+                        const name = choice.children[1].innerText.trim()
+                        selection[index] = index + ": " + name;
+                        console.log("recording vote: " + index + ": " + name);
+                    }
+                    thisContestValue["selection"] = selection;
+                }
                 // 2) clearing out the upper and lower node DOM trees
                 document.getElementById("upperSection").replaceChildren();
                 document.getElementById("lowerSection").replaceChildren();
@@ -444,7 +456,9 @@
             console.log("setupCheckout: setting up checkout page");
         }
 
-        // Setup a new contest
+        // Setup a new contest.  Note - when navigating to a new contest,
+        // the previous contest selection data is gone by the time this
+        // is called.  Just being clear about that.
         function setupNewContest(thisContest) {
             console.log("Running setupNewContest: contest " + thisContest);
             let nextContest = thisContest + 1;
@@ -475,8 +489,9 @@
             }
 
             // Setup the bottomSection - this supplies simply "next context/checkout"
-            // navigation
-            setupNextButtonListener("Next contest (" + nextContest + ")", nextContest);
+            // navigation.  Note - the voter's selection is saved when navigating away
+            // from the page - hence it needs _this_ thisContestValue.
+            setupNextButtonListener("Next contest (" + nextContest + ")", nextContest, thisContestValue);
         }
 
         // If here, this is the first contest
