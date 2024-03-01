@@ -81,6 +81,7 @@
 
         // Odds and ends
         const selectBackgroundColor = "#f5f5f5";
+        const extraSpace = "&nbsp&nbsp";
 
         // Get the number of contests which is actually ordered/subdivided by GGO
         const listOfContests = [];
@@ -177,8 +178,9 @@
                 `;
                 newItem.innerHTML = innerText;
             }
-            const newList = document.createElement("ol");
+            const newList = document.createElement("ul");
             newList.setAttribute("id", "sortableList");
+            newList.classList.add("noBullets");
             newItem.appendChild(newList);
             rootElement.appendChild(newItem);
         }
@@ -196,6 +198,7 @@
             }
             const newList = document.createElement("ul");
             newList.setAttribute("id", "choiceList");
+            newList.classList.add("noBullets");
             newItem.appendChild(newList);
             rootElement.appendChild(newItem);
         }
@@ -221,12 +224,13 @@
                 // Create the text element
                 const name = document.createElement("span");
                 const extraText = document.createElement("span");
+                name.innerHTML = extraSpace;
                 // Ugh - need to inspect for the choices data type
                 if (choice.name) {
-                    name.innerHTML = "&nbsp&nbsp" + choice.name;
+                    name.innerText += choice.name;
                 } else {
                     // Just an array of strings
-                    name.innerHTML = "&nbsp&nbsp" + choice;
+                    name.innerText +=  choice;
                 }
                 if (thisContestValue.contest_type == "ticket") {
                     // Note - need to add this as an additional flex-box
@@ -235,7 +239,8 @@
                     for (let office of thisContestValue.ticket_offices) {
                         addendum.push(office + ":" + choice.ticket_names);
                     }
-                    extraText.innerHTML = "&nbsp&nbsp[" + addendum.join(", ") + "]";
+                    extraText.innerHTML = extraSpace;
+                    extraText.innerText += "[" + addendum.join(", ") + "]";
                 }
                 // Add the unselected class
                 newItem.classList.add("unselected");
@@ -246,6 +251,7 @@
                 newItem.appendChild(extraText);
                 rootElement.appendChild(newItem);
 
+                // If setting just one choice
                 if (overrideChoice) {
                     break;
                 }
@@ -315,7 +321,6 @@
 
         // RCV event listeners
         function setupRCVEventListeners(thisContestName, thisContestValue) {
-            console.log("Running setupRCVEventListeners:");
             // Event listener for selection in the first list (when a candidate is selected)
             choiceList.addEventListener("click", (event) => {
                 if (event.target.tagName === "LI") {
@@ -332,6 +337,7 @@
                     newButton.addEventListener("click", function (e) {
                         console.log("Running RCV eventListener:");
                         let itemName = e.target.parentNode.textContent.trim().replace(/\sremove$/, "");
+                        e.target.parentNode.classList.remove("selected");
                         console.log("removing:", itemName);
                         // remove it from sortableList
                         e.target.parentNode.remove();
@@ -353,12 +359,14 @@
 
                     // Create the text element
                     const textElement = document.createElement("span");
-                    textElement.innerHTML = selectedText + "&nbsp&nbsp";
+                    textElement.innerText = selectedText;
+                    textElement.innerHTML += extraSpace;
 
                     // Append everything ...
                     newItem.appendChild(svgIcon);
                     newItem.appendChild(textElement);
                     newItem.appendChild(newButton);
+                    newItem.classList.add("selected");
                     // ... and append that to the bottom of sortableList
                     sortableList.appendChild(newItem);
 
@@ -373,7 +381,6 @@
 
         // plurality event listeners
         function setupPluralityEventListeners(thisContestName, thisContestValue) {
-            console.log("Running setupPluralityEventListeners:");
             let selectedCount = 0;
             choiceList.addEventListener("click", (event) => {
                 console.log("Running plurality eventListener:");
@@ -405,7 +412,9 @@
             });
         }
 
-        // the next/checkout button listener
+        // the next/checkout button listener.
+        // Note - it is the newButton eventListener that handles the
+        // recording of the vote.
         function setupNextButtonListener(buttonString, nextContest, thisContestValue) {
             console.log("Running setupNextButtonListener: '" + buttonString + "' button to contest " + nextContest);
             const bottomElement = document.getElementById("bottomSection");
@@ -418,7 +427,7 @@
             newButton.innerText = buttonString;
             // add an event listener to the button
             newButton.addEventListener("click", function (e) {
-                console.log("Running '" + buttonString + "' button eventListener: contest " + nextContest);
+                console.log("Running NextButton '" + buttonString + "' eventListener for contest " + nextContest);
                 // On the button click go to the next contest or the checkout screen
                 //
                 // Going to the next contest involves:
@@ -428,9 +437,10 @@
                     const selection = [];
                     let index = 0;
                     for (const choice of document.getElementsByClassName("selected")) {
-                        const name = choice.children[1].innerText.trim()
+                        const name = choice.children[1].innerText.trim();
                         selection[index] = index + ": " + name;
                         console.log("recording vote: " + index + ": " + name);
+                        index += 1;
                     }
                     thisContestValue["selection"] = selection;
                 }
