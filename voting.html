@@ -259,6 +259,7 @@
         }
 
         // Make the RCV selection sortable by drag-and-drop
+        // Note - the class is on the li node
         function initSortableList(target) {
             target.classList.add("slist");
             const items = target.getElementsByTagName("li");
@@ -323,7 +324,8 @@
         function setupRCVEventListeners(thisContestName, thisContestValue) {
             // Event listener for selection in the first list (when a candidate is selected)
             choiceList.addEventListener("click", (event) => {
-                if (event.target.tagName === "LI") {
+                if (event.target.closest("li") && event.target.closest("li").classList.contains("unselected")) {
+                    console.log("Running RCV eventListener:");
                     // Create a new selected item with a remove button
                     const selectedText = event.target.textContent;
                     const newItem = document.createElement("li");
@@ -335,10 +337,9 @@
                     newButton.classList.add("remove");
                     // add an event listener to the button
                     newButton.addEventListener("click", function (e) {
-                        console.log("Running RCV eventListener:");
-                        let itemName = e.target.parentNode.textContent.trim().replace(/\sremove$/, "");
+                        let itemName = e.target.parentNode.textContent.trim().replace(/\s+remove$/, "");
                         e.target.parentNode.classList.remove("selected");
-                        console.log("removing:", itemName);
+                        console.log("Remove button eventListener: removing '" + itemName + "'");
                         // remove it from sortableList
                         e.target.parentNode.remove();
                         // add to choiceList
@@ -362,10 +363,12 @@
                     textElement.innerText = selectedText;
                     textElement.innerHTML += extraSpace;
 
-                    // Append everything ...
+                    // Append everything to the li node
                     newItem.appendChild(svgIcon);
                     newItem.appendChild(textElement);
                     newItem.appendChild(newButton);
+
+                    // Add the class to the li node
                     newItem.classList.add("selected");
                     // ... and append that to the bottom of sortableList
                     sortableList.appendChild(newItem);
@@ -387,27 +390,30 @@
                 const listItem = event.target;
                 const itemText = listItem.textContent;
                 const itemIndex = Array.from(choiceList.children).indexOf(listItem);
-                if (listItem.tagName === "LI") {
-                    if (listItem.classList.contains("selected")) {
-                        // Deselect the item
-                        listItem.classList.add("unselected");
-                        listItem.classList.remove("selected");
-                        listItem.firstElementChild.style.fill = selectBackgroundColor;
-                        selectedCount--;
-                        // get the svg (first child) and set fill to off
-                        console.log("de-selected " + itemIndex + ", " + itemText);
-                    } else if (selectedCount < thisContestValue.max) {
+                // Note - one can (correctly) select the circle, or svg, or text,
+                // or the li
+                const theLi = listItem.closest("li");
+                if (theLi.classList.contains("unselected")) {
+                    if (selectedCount < thisContestValue.max) {
                         // Select the item (up to maxSelection selections allowed)
-                        listItem.classList.add("selected");
-                        listItem.classList.remove("unselected");
+                        theLi.classList.add("selected");
+                        theLi.classList.remove("unselected");
                         // get the svg (first child) and set fill to on (black)
-                        listItem.firstElementChild.style.fill = "black"
+                        theLi.firstElementChild.style.fill = "black"
                         selectedCount++;
                         console.log("selected " + itemIndex + ", " + itemText);
                     } else {
                         // Overvote
                         console.log("rejected (overvote) - ignoring " + itemIndex + ", " + itemText);
                     }
+                } else if (theLi.classList.contains("selected")) {
+                    // Deselect the item
+                    theLi.classList.add("unselected");
+                    theLi.classList.remove("selected");
+                    theLi.firstElementChild.style.fill = selectBackgroundColor;
+                    selectedCount--;
+                    // get the svg (first child) and set fill to off
+                    console.log("de-selected " + itemIndex + ", " + itemText);
                 }
             });
         }
@@ -464,6 +470,19 @@
         // Setup the checkout
         function setupCheckout() {
             console.log("setupCheckout: setting up checkout page");
+            // ZZZ
+            // The voter's selections are:
+            let index = 0;
+            for (const ggo of blankBallot.active_ggos) {
+                if (blankBallot.contests[ggo]) {
+                    for (const contest of blankBallot.contests[ggo]) {
+                        const contestName = Object.keys(contest)[0];
+                        const selection = Object.values(contest)[0].selection;
+                        index += 1;
+                        console.log("contest " + index + ", selection = " + selection)
+                    }
+                }
+            }
         }
 
         // Setup a new contest.  Note - when navigating to a new contest,

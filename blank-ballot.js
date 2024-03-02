@@ -37,9 +37,6 @@ const blankBallotJSON = `{
                     ],
                     "contest_type": "ticket",
                     "max": 1,
-                    "selection": [
-                        "0: Circle Party Ticket"
-                    ],
                     "tally": "plurality",
                     "ticket_offices": [
                         "President",
@@ -76,11 +73,6 @@ const blankBallotJSON = `{
                             "party": "Hexagon Party"
                         }
                     ],
-                    "selection": [
-                        "5: Francis Foxtrot",
-                        "4: Emily Echo",
-                        "3: David Delta"
-                    ],
                     "tally": "rcv",
                     "uid": "0001"
                 }
@@ -98,9 +90,6 @@ const blankBallotJSON = `{
                         }
                     ],
                     "max": 1,
-                    "selection": [
-                        "1: Cosmo Spacely"
-                    ],
                     "tally": "plurality",
                     "uid": "0002"
                 }
@@ -115,9 +104,6 @@ const blankBallotJSON = `{
                         "James T. Kirk"
                     ],
                     "max": 1,
-                    "selection": [
-                        "0: Jean-Luc Picard"
-                    ],
                     "tally": "plurality",
                     "uid": "0003"
                 }
@@ -132,9 +118,6 @@ const blankBallotJSON = `{
                     ],
                     "description": "Should the Town of Concord start the annual Town Meeting at 6:30 PM instead of 7:00 PM?",
                     "max": 1,
-                    "selection": [
-                        "0: yes"
-                    ],
                     "tally": "plurality",
                     "uid": "0004"
                 }
