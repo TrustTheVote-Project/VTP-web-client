@@ -4,7 +4,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="stylesheets/voting.css">
-        <script src="blank-ballot.js"></script>
+        <script src="javascript/blank-ballot.js"></script>
         <title>Voting - User Story 2</title>
         <style>
         /* box debugging
@@ -437,7 +437,8 @@
                 //
                 // Going to the next contest involves:
                 // 1) capturing the vote (a.k.a. thisContest's selections) before it
-                //    (probably?) gets wiped out when the DOM children are reaped
+                //    (probably?) gets wiped out when the DOM children are reaped.
+                //    thisContestValue is a reference into blankBallot
                 if (thisContestValue) {
                     const selection = [];
                     let index = 0;
@@ -469,16 +470,27 @@
         // Setup the checkout
         function setupCheckout() {
             console.log("setupCheckout: setting up checkout page");
-            // ZZZ
-            // The voter's selections are:
+            // 1) adjust the progress bars
+
+            // 2) loop over the voters selections per contest and create a
+            // bordered flex-box li item with a two li item sublist:
+            //    - a two sub node li consisting of the contest number and
+            //      name/title/question
+            //    - a two sub node li consisting of the ordered list of the
+            //      selections and a GoTo navigation button
+
+            // 3) create a vote button which will:
+            //    - print the selections to the console
+            //    - send the modified blankBallot.json to the web-api that will
+            //      cast the voter's ballot and return the ballot receipt
             let index = 0;
             for (const ggo of blankBallot.active_ggos) {
                 if (blankBallot.contests[ggo]) {
                     for (const contest of blankBallot.contests[ggo]) {
                         const contestName = Object.keys(contest)[0];
-                        const selection = Object.values(contest)[0].selection;
+                        const selections = Object.values(contest)[0].selection;
                         index += 1;
-                        console.log("contest " + index + ", selection = " + selection)
+                        console.log("contest " + index + ", selection = " + selections);
                     }
                 }
             }
