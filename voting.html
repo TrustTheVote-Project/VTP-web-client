@@ -131,12 +131,12 @@
             // Note - the last progress bar section wants to the same class
             // as the other so not to have any borders
             newBarElement.setAttribute("class", "yrhSection");
-            newBarElement.setAttribute("id", "progBar" + (numberOfContests + 1));
+            newBarElement.setAttribute("id", "progBar" + numberOfContests);
             newBarElement.innerHTML = "checkout";
             progBarElement.appendChild(newBarElement);
             const newYrhElement = document.createElement("div");
             newYrhElement.setAttribute("class", "yrhSection");
-            newYrhElement.setAttribute("id", "yrhBar" + (numberOfContests + 1));
+            newYrhElement.setAttribute("id", "yrhBar" + numberOfContests);
             yrhBarElement.appendChild(newYrhElement);
         }
 
@@ -155,11 +155,22 @@
         }
 
         // Will set up the upperSection
-        function setUpperSection(thisContestName, thisContestValue) {
+        function setUpperSection(thisContestName=null, thisContestValue=null, checkout=false) {
             const rootElement = document.getElementById("upperSection");
             const newItem = document.createElement("span");
-            const max = thisContestValue.max;
-            if (thisContestValue.tally == "plurality") {
+            if (checkout) {
+                // Setup the checkout page
+                let innerText = `<h2>Ballot Checkout</h2><ul>
+<li>Verify that each contest is how you would like to vote.</li>
+<li>You can select the edit button next to any contest re-edit your selection</li>
+<li>Clicking the <b>VOTE</b> button at the bottom of the page will cast your ballot</li>
+<li>When you cast your ballot, you will receive an anonymous ballot receipt with 100 randomized contest checks</li>
+<li>If you click <b>VOTE and reveal row</b>, in addition to the ballot receipt, you will momentarily be shown your private row number.
+<li>Though the ballot receipt is public, the row number is private.  Revealing your row number AND your ballot receipt will allow others to see how you voted.</li></ul>`;
+                newItem.innerHTML = innerText;
+            } else if (thisContestValue.tally == "plurality") {
+                const max = thisContestValue.max;
+                // Setup plurality contest header info
                 let innerText = "<h2>" + thisContestName + "</h2><h3>A plurality contest:</h3><ul><li>Make you selection by clicking.  Click again to unselect.</li>";
                 if (max == 1) {
                     innerText += "<li>You can only make one selection</li></ul>";
@@ -168,6 +179,7 @@
                 }
                 newItem.innerHTML = innerText;
             } else {
+                // Setup IRV contest header info
                 innerText = "<h2>" + thisContestName + `</h2><h3> RCV (IRV) contest:</h3>
                 <ul>
                 <li>Clicking a candidate will add it to your RCV</li>
@@ -186,10 +198,12 @@
         }
 
         // Will set up the lowerSection
-        function setLowerSection(thisContestValue) {
+        function setLowerSection(thisContestValue, checkout=false) {
             const rootElement = document.getElementById("lowerSection");
             const newItem = document.createElement("span");
-            if (thisContestValue.contest_type == "ticket") {
+            if (checkout) {
+                newItem.innerHTML = "";
+            } else if (thisContestValue.contest_type == "ticket") {
                 newItem.innerHTML = "<h3>Candidates:</h3>";
             } else if (thisContestValue.contest_type == "question") {
                 newItem.innerHTML = "<h3>Your selection:</h3>";
@@ -382,7 +396,7 @@
             });
         }
 
-        // plurality event listeners
+        // plurality contest choice (li item) event listeners
         function setupPluralityEventListeners(thisContestName, thisContestValue) {
             let selectedCount = 0;
             choiceList.addEventListener("click", (event) => {
@@ -418,8 +432,11 @@
         }
 
         // the next/checkout button listener.
-        // Note - it is the newButton eventListener that handles the
-        // recording of the vote.
+        // Note - it is the newButton EventListener defined and attached here
+        // that records the vote in the blankBallot object AND clears out the
+        // three DOM sections.  So when the newButton EventListener calls
+        // either setupNextContest or setupCheckout, the three DOM sections
+        // have been cleared out and are ready to be re-populated.
         function setupNextButtonListener(buttonString, nextContest, thisContestValue) {
             console.log("Running setupNextButtonListener: '" + buttonString + "' button to contest " + nextContest);
             const bottomElement = document.getElementById("bottomSection");
@@ -467,33 +484,71 @@
             bottomElement.appendChild(newList);
         }
 
-        // Setup the checkout
+        // Setup the checkout page
+        // Called from newButton event listener, which means that the 'previous'
+        // page contents are still being displayed
         function setupCheckout() {
             console.log("setupCheckout: setting up checkout page");
             // 1) adjust the progress bars
+            setProgressBarColor(numberOfContests, "#D5F5E3");
+            setActiveContest(numberOfContests);
 
             // 2) loop over the voters selections per contest and create a
             // bordered flex-box li item with a two li item sublist:
             //    - a two sub node li consisting of the contest number and
             //      name/title/question
             //    - a two sub node li consisting of the ordered list of the
-            //      selections and a GoTo navigation button
-
-            // 3) create a vote button which will:
-            //    - print the selections to the console
-            //    - send the modified blankBallot.json to the web-api that will
-            //      cast the voter's ballot and return the ballot receipt
+            //      selections and a Change/Edit/GoTo navigation button
+            // Arbitrarily place the help text in upperSection and the actual
+            // selections in the lowerSection and the vote buttons in the
+            // bottomSection.
+            setUpperSection("checkout", null, true);
+            setLowerSection("checkout", true);
+            const rootElement = document.getElementById("choiceList");
             let index = 0;
             for (const ggo of blankBallot.active_ggos) {
                 if (blankBallot.contests[ggo]) {
                     for (const contest of blankBallot.contests[ggo]) {
+                        const newItem = document.createElement("li");
                         const contestName = Object.keys(contest)[0];
                         const selections = Object.values(contest)[0].selection;
                         index += 1;
                         console.log("contest " + index + ", selection = " + selections);
+                        newItem.innerHTML = "Contest " + index + ":&nbsp&nbsp" + contestName;
+                        newItem.innerHTML += "<br><br>" + selections.join("&nbsp<br>");
+                        // Create the goto button
+                        const gotoButton = document.createElement("button");
+                        gotoButton.innerText = "Edit Contest " + index;
+                        gotoButton.id = "gotoContest" + index;
+                        // add an event listener to the button
+                        gotoButton.addEventListener("click", function (e) {
+                            console.log("Running gotoButton to contest " + index);
+                            // On a goto button click, clear out the children ...
+                            document.getElementById("upperSection").replaceChildren();
+                            document.getElementById("lowerSection").replaceChildren();
+                            document.getElementById("bottomSection").replaceChildren();
+                            // ... and goto the contest
+                            const buttonIdString = Number(this.id.match(/\d+$/)) - 1;
+                            setupNewContest(buttonIdString);
+                        });
+                        // add the above to lowerSection.choiceList
+                        rootElement.appendChild(newItem);
+                        rootElement.appendChild(gotoButton);
                     }
                 }
             }
+
+            // 3) Create two buttons.  The first is a simply vote button.  The
+            // second is a vote button that also momentarily returns the voter's
+            // row offset.  Create both and place then in a flex-box row.
+
+            // When either button is clicked:
+            //    - print the selections to the console
+            //    - send the modified blankBallot.json to the web-api that will
+            //      cast the voter's ballot and return the ballot receipt and
+            //      optionally return the voter's row index.
+
+            // Place the two buttons in the bottomSection
         }
 
         // Setup a new contest.  Note - when navigating to a new contest,
