@@ -109,6 +109,8 @@
         yrhIcon.innerHTML = `<path d="M26.221 16c0-7.243-5.871-13.113-13.113-13.113s-13.113 5.87-13.113 13.113c0 7.242 5.871 13.113 13.113 13.113s13.113-5.871 13.113-13.113zM1.045 16c0-6.652 5.412-12.064 12.064-12.064s12.064 5.412 12.064 12.064c0 6.652-5.411 12.064-12.064 12.064-6.652 0-12.064-5.412-12.064-12.064z"></path><path d="M18.746 15.204l0.742-0.742-6.379-6.379-6.378 6.379 0.742 0.742 5.112-5.112v12.727h1.049v-12.727z"></path>`;
 
         // Will set up the progress bars with numberOfContests contests
+        // NOTE - the printed/user-visible contest numbers are 1 based while
+        // everything else (the backend, internal, etc) is 0 based.
         function setupProgressBars(numberOfContests) {
             const progBarElement = document.getElementById("progressBar");
             const yrhBarElement = document.getElementById("youAreHereBar");
@@ -141,12 +143,18 @@
         }
 
         // Will set the color of the progress bar (per contest)
+        // NOTE - contestNum is zero based
         function setProgressBarColor(contestNum, color) {
             const sectionElement = document.getElementById("progBar" + contestNum);
-            sectionElement.style.backgroundColor = color;
+            // Need to clear out all existing background styles
+            for (const color of ["novotedBG", "undervotedBG", "votedBG", "activeContest"]) {
+                sectionElement.classList.remove(color)
+            }
+            sectionElement.classList.add(color);
         }
 
         // Will set the contents of the youAreHereBar bar (per contest)
+        // NOTE - contestNum is zero based
         function setActiveContest(contestNum) {
             const sectionElement = document.getElementById("yrhBar" + contestNum);
             const newElement = document.createElement("span");
@@ -466,16 +474,32 @@
                         index += 1;
                     }
                     thisContestValue["selection"] = selection;
+                    // and setting the progressBar color
+                    let max = thisContestValue.max;
+                    let contestNum = nextContest - 1;
+                    if (!max) {
+                        max = thisContestValue.choices.length;
+                    }
+                    console.log("");
+                    if (selection.length == 0) {
+                        console.log("Contest " + contestNum + " no voted");
+                        setProgressBarColor(contestNum, "novotedBG");
+                    } else if (max == selection.length) {
+                        console.log("Contest " + contestNum + " voted");
+                        setProgressBarColor(contestNum, "votedBG");
+                    } else {
+                        console.log("Contest " + contestNum + " undervoted voted");
+                        setProgressBarColor(contestNum, "undervotedBG");
+                    }
                 }
                 // 2) clearing out the upper and lower node DOM trees
                 document.getElementById("upperSection").replaceChildren();
                 document.getElementById("lowerSection").replaceChildren();
                 document.getElementById("bottomSection").replaceChildren();
+                // 3) Going somewhere
                 if (nextContest < numberOfContests) {
-                    // 3a) go to next contest
                     setupNewContest(nextContest);
                 } else {
-                    // 3b) go to checkout
                     setupCheckout();
                 }
             });
@@ -490,7 +514,6 @@
         function setupCheckout() {
             console.log("setupCheckout: setting up checkout page");
             // 1) adjust the progress bars
-            setProgressBarColor(numberOfContests, "#D5F5E3");
             setActiveContest(numberOfContests);
 
             // 2) loop over the voters selections per contest and create a
@@ -528,7 +551,7 @@
                         box1.innerHTML = "Contest " + index + ":&nbsp&nbsp" + contestName;
                         if (selections.length == 0) {
                             box2.innerHTML = "no selection - skipped";
-                            box2.classList.add("novoted");
+                            box2.classList.add("novotedText");
                         } else {
                             box2.innerHTML = selections.join("<br>");
                         }
@@ -581,7 +604,7 @@
             let thisContestValue = Object.values(listOfContests[thisContest])[0];
 
             // and initialize them
-            setProgressBarColor(thisContest, "#D5F5E3");
+            setProgressBarColor(thisContest, "activeContest");
             setActiveContest(thisContest);
 
             // Setup the upper and lower sections

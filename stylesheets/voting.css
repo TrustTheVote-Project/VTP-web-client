@@ -14,11 +14,26 @@
 }
 
 /* colors for completely voted and undervoted and novoted */
-.novoted {
+.novotedText {
+    color: #FF6B6B;
 }
-.undervoted {
+.undervotedText {
+    color: #FFD166;
 }
-.voted {
+.votedText {
+    color: #6EE7B7;
+}
+.novotedBG {
+    background-color: #FF6B6B;
+}
+.undervotedBG {
+    background-color: #FFD166;
+}
+.votedBG {
+    background-color: #6EE7B7;
+}
+.activeContest {
+    background-color: white;
 }
 
 /* Each section (class) gets an individual black border */
