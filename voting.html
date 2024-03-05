@@ -690,7 +690,11 @@
             // Setup the bottomSection - this supplies simply "next context/checkout"
             // navigation.  Note - the voter's selection is saved when navigating away
             // from the page - hence it needs _this_ thisContestValue.
-            setupNextButtonListener("Next contest (" + nextContest + ")", nextContest, thisContestValue);
+            let nextButtonString = "Go to next contest";
+            if (nextContest >= numberOfContests) {
+                nextButtonString = "Go to checkout";
+            }
+            setupNextButtonListener(nextButtonString, nextContest, thisContestValue);
         }
 
         // If here, this is the first contest
