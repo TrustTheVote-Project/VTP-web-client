@@ -200,7 +200,7 @@
 <li>` + innerStr + `</li>
 </ul>
 <h3>Your RCV selection:</h3>
-`;
+        `;
                 newItem.innerHTML = innerText;
             }
             const newList = document.createElement("ul");
@@ -513,6 +513,16 @@
             bottomElement.appendChild(newList);
         }
 
+        // Helper function for pretty printing selections
+        function smartenSelections(selections, tally) {
+            const arr = [...selections];
+            if (tally == "plurality") {
+                return arr.map((str) => str.replace(/^\d+:\s+/, ""));
+            } else {
+                return arr.map((str) => str.replace(/^\d+/, (match) => parseInt(match, 10) + 1));
+            }
+        }
+
         // Setup the checkout page
         // Called from newButton event listener, which means that the 'previous'
         // page contents are still being displayed
@@ -538,17 +548,15 @@
                 if (blankBallot.contests[ggo]) {
                     for (const contest of blankBallot.contests[ggo]) {
                         const newItem = document.createElement("li");
-                        // a flexbox container
-                        newItem.classList.add("selectionFlexContainer");
-                        // flexboxes
-                        const leftSide = document.createElement("div");
-                        leftSide.classList.add("leftItems");
-                        const box1 = document.createElement("div");
-                        box1.classList.add("leftItem");
-                        const box2 = document.createElement("div");
-                        box2.classList.add("leftItem");
-                        const box3 = document.createElement("div");
-                        box3.classList.add("rightItems");
+                        // just ake a table for now
+                        newItem.classList.add("tableflexContainer");
+                        // td's
+                        const box1 = document.createElement("td");
+                        box1.style.textAlign = "center";
+                        const box2 = document.createElement("td");
+                        box2.style.textAlign = "left";
+                        const box3 = document.createElement("td");
+                        box3.style.textAlign = "right";
                         const contestName = Object.keys(contest)[0];
                         const selections = Object.values(contest)[0].selection;
                         index += 1;
@@ -558,7 +566,7 @@
                             box2.innerHTML = "no selection - skipped";
                             box2.classList.add("novotedText");
                         } else {
-                            box2.innerHTML = selections.join("<br>");
+                            box2.innerHTML = smartenSelections(selections, Object.values(contest)[0].tally).join("<br>");
                         }
                         // Create the goto button
                         const gotoButton = document.createElement("button");
@@ -576,11 +584,20 @@
                             setupNewContest(buttonIdString);
                         });
                         box3.appendChild(gotoButton);
-                        // add the above to lowerSection.choiceList
-                        leftSide.appendChild(box1);
-                        leftSide.appendChild(box2);
-                        newItem.appendChild(leftSide);
-                        newItem.appendChild(box3);
+                        // Create the table and add it
+                        const table1 = document.createElement("table");
+                        table1.classList.add("tableStyle");
+                        const table2 = document.createElement("table");
+                        table2.classList.add("tableStyle");
+                        const row1 = document.createElement("tr");
+                        const row2 = document.createElement("tr");
+                        row1.appendChild(box1);
+                        row2.appendChild(box2);
+                        row2.appendChild(box3);
+                        table1.appendChild(row1);
+                        table2.appendChild(row2);
+                        newItem.appendChild(table1);
+                        newItem.appendChild(table2);
                         rootElement.appendChild(newItem);
                     }
                 }

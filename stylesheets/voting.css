@@ -93,19 +93,10 @@
 /* flexbox for the checkout page selection box */
 .selectionFlexContainer {
     display: flex;
-    justify-content: space-between; /* items will be spaced evenly */
-    align-items: center; /* vertically cnter items */
 }
-.leftItem {
-    margin: 0 5px;
-    padding: 0 5px;
+.tableStyle {
+    width: 100%;
+    padding: 0;
+    margin: 0;
 }
-.leftItems {
-    display: flex;
-    flex-direction: column;
-}
-.rightItems {
-    margin-left: auto; /* Push this item to the right */
-}
-
 </style>
