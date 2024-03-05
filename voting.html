@@ -39,8 +39,6 @@
         <div id="progressBar"></div>
         <div id="youAreHereBar"></div>
 
-        <p>Progress bar per contest and current contest</p>
-
         <!-- The upper span starts here
              Note - when exiting a contest page, all child nodes of upperSection
              will be wiped out.
@@ -163,7 +161,7 @@
         }
 
         // Will set up the upperSection
-        function setUpperSection(thisContestName=null, thisContestValue=null, checkout=false) {
+        function setUpperSection(contestNum, thisContestName, thisContestValue, checkout=false) {
             const rootElement = document.getElementById("upperSection");
             const newItem = document.createElement("span");
             if (checkout) {
@@ -179,7 +177,7 @@
             } else if (thisContestValue.tally == "plurality") {
                 const max = thisContestValue.max;
                 // Setup plurality contest header info
-                let innerText = "<h2>" + thisContestName + "</h2><h3>A plurality contest:</h3><ul><li>Make you selection by clicking.  Click again to unselect.</li>";
+                let innerText = "<h2>Contest " + (contestNum + 1) + ":&nbsp&nbsp&nbsp" + thisContestName + "</h2><h3>This is a plurality contest:</h3><ul><li>Make you selection by clicking.  Click again to unselect.</li>";
                 if (max == 1) {
                     innerText += "<li>You can only make one selection</li></ul>";
                 } else {
@@ -188,14 +186,21 @@
                 newItem.innerHTML = innerText;
             } else {
                 // Setup IRV contest header info
-                innerText = "<h2>" + thisContestName + `</h2><h3> RCV (IRV) contest:</h3>
-                <ul>
-                <li>Clicking a candidate will add it to your RCV</li>
-                <li>Your RCV selection is re-orderable by drag-and-drop</li>
-                <li>Clicking a selection's remove button un-selects a candidate</li>
-                </ul>
-                <h2>Your RCV selection:</h2>
-                `;
+                let innerStr = "";
+                if (!thisContestValue.choices.length) {
+                    innerStr = "You can select up to all the candidates";
+                } else {
+                    innerStr = "You can select up to " + thisContestValue.choices.length + "candidates";
+                }
+                let innerText = "<h2>Contest " + (contestNum + 1) + ":&nbsp&nbsp&nbsp" + thisContestName + `</h2><h3>This is a RCV contest:</h3>
+<ul>
+<li>Clicking a candidate will add it in order to your RCV</li>
+<li>Your RCV selection is re-orderable by drag-and-drop the selections</li>
+<li>Clicking a selection's remove button deselects a candidate</li>
+<li>` + innerStr + `</li>
+</ul>
+<h3>Your RCV selection:</h3>
+`;
                 newItem.innerHTML = innerText;
             }
             const newList = document.createElement("ul");
@@ -525,7 +530,7 @@
             // Arbitrarily place the help text in upperSection and the actual
             // selections in the lowerSection and the vote buttons in the
             // bottomSection.
-            setUpperSection("checkout", null, true);
+            setUpperSection(null, "checkout", null, true);
             setLowerSection("checkout", true);
             const rootElement = document.getElementById("choiceList");
             let index = 0;
@@ -608,7 +613,7 @@
             setActiveContest(thisContest);
 
             // Setup the upper and lower sections
-            setUpperSection(thisContestName, thisContestValue);
+            setUpperSection(thisContest, thisContestName, thisContestValue);
             setLowerSection(thisContestValue);
 
             // Note - for the moment let these be globals (until we know more).
