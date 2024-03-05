@@ -573,11 +573,21 @@
                         index += 1;
                         console.log("contest " + index + " (" + contestName + "), selection = " + selections);
                         box1.innerHTML = "Contest " + index + ":&nbsp&nbsp" + contestName;
+                        let max = Object.values(contest)[0].max;
+                        if (!max) {
+                            max = Object.values(contest)[0].choices.length;
+                        }
                         if (selections.length == 0) {
                             box2.innerHTML = "no selection - skipped";
                             box2.classList.add("novotedText");
                         } else {
                             box2.innerHTML = smartenSelections(selections, Object.values(contest)[0].tally).join("<br>");
+                            if (selections.length < max) {
+                                const extraText = document.createElement("span");
+                                extraText.innerHTML = "<br>undervoted - more votes are allowed";
+                                extraText.classList.add("undervotedText");
+                                box2.appendChild(extraText);
+                            }
                         }
                         // Create the goto button
                         const gotoButton = document.createElement("button");
