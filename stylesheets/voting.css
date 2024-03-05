@@ -13,6 +13,14 @@
     text-align: center;
 }
 
+/* colors for completely voted and undervoted and novoted */
+.novoted {
+}
+.undervoted {
+}
+.voted {
+}
+
 /* Each section (class) gets an individual black border */
 .progSection {
     flex: 1; /* Equal distribution of space */
@@ -65,6 +73,24 @@
 /* bottom section */
 .noBullets {
     list-style-type: none;
+}
+
+/* flexbox for the checkout page selection box */
+.selectionFlexContainer {
+    display: flex;
+    justify-content: space-between; /* items will be spaced evenly */
+    align-items: center; /* vertically cnter items */
+}
+.leftItem {
+    margin: 0 5px;
+    padding: 0 5px;
+}
+.leftItems {
+    display: flex;
+    flex-direction: column;
+}
+.rightItems {
+    margin-left: auto; /* Push this item to the right */
 }
 
 </style>

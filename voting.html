@@ -510,12 +510,28 @@
                 if (blankBallot.contests[ggo]) {
                     for (const contest of blankBallot.contests[ggo]) {
                         const newItem = document.createElement("li");
+                        // a flexbox container
+                        newItem.classList.add("selectionFlexContainer");
+                        // flexboxes
+                        const leftSide = document.createElement("div");
+                        leftSide.classList.add("leftItems");
+                        const box1 = document.createElement("div");
+                        box1.classList.add("leftItem");
+                        const box2 = document.createElement("div");
+                        box2.classList.add("leftItem");
+                        const box3 = document.createElement("div");
+                        box3.classList.add("rightItems");
                         const contestName = Object.keys(contest)[0];
                         const selections = Object.values(contest)[0].selection;
                         index += 1;
-                        console.log("contest " + index + ", selection = " + selections);
-                        newItem.innerHTML = "Contest " + index + ":&nbsp&nbsp" + contestName;
-                        newItem.innerHTML += "<br><br>" + selections.join("&nbsp<br>");
+                        console.log("contest " + index + " (" + contestName + "), selection = " + selections);
+                        box1.innerHTML = "Contest " + index + ":&nbsp&nbsp" + contestName;
+                        if (selections.length == 0) {
+                            box2.innerHTML = "no selection - skipped";
+                            box2.classList.add("novoted");
+                        } else {
+                            box2.innerHTML = selections.join("<br>");
+                        }
                         // Create the goto button
                         const gotoButton = document.createElement("button");
                         gotoButton.innerText = "Edit Contest " + index;
@@ -531,9 +547,13 @@
                             const buttonIdString = Number(this.id.match(/\d+$/)) - 1;
                             setupNewContest(buttonIdString);
                         });
+                        box3.appendChild(gotoButton);
                         // add the above to lowerSection.choiceList
+                        leftSide.appendChild(box1);
+                        leftSide.appendChild(box2);
+                        newItem.appendChild(leftSide);
+                        newItem.appendChild(box3);
                         rootElement.appendChild(newItem);
-                        rootElement.appendChild(gotoButton);
                     }
                 }
             }
