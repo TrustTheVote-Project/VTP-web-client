@@ -114,12 +114,12 @@
         function setupProgressBars(numberOfContests) {
             const progBarElement = document.getElementById("progressBar");
             const yrhBarElement = document.getElementById("youAreHereBar");
-            for (let contestNum = 0; contestNum < numberOfContests; contestNum++) {
-                const id = contestNum + 1;
+            for (let index = 0; index < numberOfContests; index++) {
+                const id = index + 1;
                 // progress bar
                 const newBarElement = document.createElement("div");
                 newBarElement.setAttribute("class", "progSection");
-                newBarElement.setAttribute("id", "progBar" + contestNum);
+                newBarElement.setAttribute("id", "progBar" + index);
                 // Add navigation button with the contest id as the button
                 // string ZZZ
                 newBarElement.innerHTML = id;
@@ -127,7 +127,7 @@
                 // youAreHereBar bar
                 const newYrhElement = document.createElement("div");
                 newYrhElement.setAttribute("class", "yrhSection");
-                newYrhElement.setAttribute("id", "yrhBar" + contestNum);
+                newYrhElement.setAttribute("id", "yrhBar" + index);
                 yrhBarElement.appendChild(newYrhElement);
             }
             // Add a final checkout section
@@ -546,6 +546,36 @@
             bottomElement.appendChild(table);
         }
 
+        // Setup the progressBar navigation buttons.  Design note - as the
+        // design of this fell into place (!), the code to store the voter's
+        // selection ended up being placed in the event listener that
+        // navigated away from the page (setupNavigationButtonListener).  That
+        // creates a closure for the actual event listener.  Sooo, when adding
+        // event listeners to the progressBar, the same thing needs to be done,
+        // which means for the moment (without a class structure design etc)
+        // each contest page needs to redefine the even listener so to have
+        // the correct closure so that it (the navigation away) does the
+        // correct thing (as the closure contains the thisContestNum value).
+        function setupProgressBarNavigation(thisContestNum, thisContestValue) {
+            // loop over the entire progressBar and replace the event listeners
+            for (let index = 0; index < numberOfContests; index++) {
+                const id = "progBar" + index;
+                const barElement = document.getElementById(id);
+                // remove anything that exists
+                barElement.replaceChildren();
+                // add new button
+                const barButton = setupNavigationButtonListener(index+1, thisContestNum, thisContestValue, index);
+                barElement.appendChild(barButton)
+            }
+            // And add one for the checkout page
+            const barElement = document.getElementById("progBar" + numberOfContests);
+            // remove anything that exists
+            barElement.replaceChildren();
+            // add new button
+            const barButton = setupNavigationButtonListener("checkout", thisContestNum, thisContestValue, numberOfContests);
+            barElement.appendChild(barButton)
+        }
+
         // Helper function for pretty printing selections
         function smartenSelections(selections, tally) {
             const arr = [...selections];
@@ -555,7 +585,8 @@
                 return arr.map((str) => str.replace(/^\d+/, (match) => parseInt(match, 10) + 1));
             }
         }
-        // Just simply get the name
+
+        // Helper function to return the selection zer-offset index and name
         function splitSelection(selection) {
             return selection.split(/:\s+/, 2);
         }
@@ -661,6 +692,7 @@
             //      optionally return the voter's row index.
 
             // Place the two buttons in the bottomSection
+            // ZZZ
         }
 
         // Setup a new contest.  Note - when navigating to a new contest,
@@ -726,6 +758,8 @@
             // navigation.  Note - the voter's selection is saved when navigating away
             // from the page - hence it needs _this_ thisContestValue.
             setupBottomNavigation(thisContestNum, thisContestNum + 1, thisContestValue);
+            // Setup progressBar navigation
+            setupProgressBarNavigation(thisContestNum, thisContestValue);
         }
 
         // If here, this is the first contest
