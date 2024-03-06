@@ -114,18 +114,20 @@
         function setupProgressBars(numberOfContests) {
             const progBarElement = document.getElementById("progressBar");
             const yrhBarElement = document.getElementById("youAreHereBar");
-            for (let contest = 0; contest < numberOfContests; contest++) {
-                const id = contest + 1;
+            for (let contestNum = 0; contestNum < numberOfContests; contestNum++) {
+                const id = contestNum + 1;
                 // progress bar
                 const newBarElement = document.createElement("div");
                 newBarElement.setAttribute("class", "progSection");
-                newBarElement.setAttribute("id", "progBar" + contest);
+                newBarElement.setAttribute("id", "progBar" + contestNum);
+                // Add navigation button with the contest id as the button
+                // string ZZZ
                 newBarElement.innerHTML = id;
                 progBarElement.appendChild(newBarElement);
                 // youAreHereBar bar
                 const newYrhElement = document.createElement("div");
                 newYrhElement.setAttribute("class", "yrhSection");
-                newYrhElement.setAttribute("id", "yrhBar" + contest);
+                newYrhElement.setAttribute("id", "yrhBar" + contestNum);
                 yrhBarElement.appendChild(newYrhElement);
             }
             // Add a final checkout section
@@ -457,25 +459,20 @@
         // three DOM sections.  So when the newButton EventListener calls
         // either setupNextContest or setupCheckout, the three DOM sections
         // have been cleared out and are ready to be re-populated.
-        function setupNextButtonListener(buttonString, nextContest, thisContestValue) {
-            console.log("Running setupNextButtonListener: '" + buttonString + "' button to contest " + nextContest);
-            const bottomElement = document.getElementById("bottomSection");
-            const newList = document.createElement("ul");
-            newList.classList.add("flex-item"); // Apply a class for styling
-            newList.classList.add("noBullets");
+        function setupNavigationButtonListener(buttonString, thisContestNum, thisContestValue, nextContestNum) {
             const newItem = document.createElement("li");
             // Create a next/checkout button
             const newButton = document.createElement("button");
             newButton.innerText = buttonString;
             // add an event listener to the button
             newButton.addEventListener("click", function (e) {
-                console.log("Running NextButton '" + buttonString + "' eventListener for contest " + nextContest);
+                console.log("Running NextButton '" + buttonString + "' eventListener for contest " + nextContestNum);
                 // On the button click go to the next contest or the checkout screen
                 //
                 // Going to the next contest involves:
                 // 1) capturing the vote (a.k.a. thisContest's selections) before it
                 //    (probably?) gets wiped out when the DOM children are reaped.
-                //    thisContestValue is a reference into blankBallot
+                //    thisContestValue is a reference into the blankBallot object.
                 if (thisContestValue) {
                     const selection = [];
                     let index = 0;
@@ -488,20 +485,19 @@
                     thisContestValue["selection"] = selection;
                     // and setting the progressBar color
                     let max = thisContestValue.max;
-                    let contestNum = nextContest - 1;
                     if (!max) {
                         max = thisContestValue.choices.length;
                     }
                     console.log("");
                     if (selection.length == 0) {
-                        console.log("Contest " + contestNum + " no voted");
-                        setProgressBarColor(contestNum, "novotedBG");
+                        console.log("Contest " + thisContestNum + " no voted");
+                        setProgressBarColor(thisContestNum, "novotedBG");
                     } else if (max == selection.length) {
-                        console.log("Contest " + contestNum + " voted");
-                        setProgressBarColor(contestNum, "votedBG");
+                        console.log("Contest " + thisContestNum + " voted");
+                        setProgressBarColor(thisContestNum, "votedBG");
                     } else {
-                        console.log("Contest " + contestNum + " undervoted voted");
-                        setProgressBarColor(contestNum, "undervotedBG");
+                        console.log("Contest " + thisContestNum + " undervoted voted");
+                        setProgressBarColor(thisContestNum, "undervotedBG");
                     }
                 }
                 // 2) clearing out the upper and lower node DOM trees
@@ -509,15 +505,45 @@
                 document.getElementById("lowerSection").replaceChildren();
                 document.getElementById("bottomSection").replaceChildren();
                 // 3) Going somewhere
-                if (nextContest < numberOfContests) {
-                    setupNewContest(nextContest);
+                if (nextContestNum < numberOfContests) {
+                    setupNewContest(nextContestNum);
                 } else {
                     setupCheckout();
                 }
             });
+            return newButton;
+        }
+
+        // Setup the bottom navigation buttons
+        function setupBottomNavigation(thisContestNum, nextContestNum, thisContestValue) {
+            const bottomElement = document.getElementById("bottomSection");
+            const newList = document.createElement("ul");
+            newList.classList.add("flex-item"); // Apply a class for styling
+            newList.classList.add("noBullets");
+            // For now, always create two buttons (UX TBD later)
+            let nextButtonString = "Go to next contest";
+            let prevContestNum = thisContestNum - 1;
+            if (nextContestNum >= numberOfContests) {
+                nextButtonString = "Go to checkout";
+            }
+            let previousButtonString = "Go to previous contest";
+            if (thisContestNum == 0) {
+                previousButtonString = "Go directly to checkout";
+                prevContestNum = numberOfContests + 1;
+            }
+            // Add the buttons as a table
+            const table = document.createElement("table");
+            table.classList.add("tableStyle");
+            const row = document.createElement("tr");
+            const col1 = document.createElement("td");
+            const col2 = document.createElement("td");
+            col1.appendChild(setupNavigationButtonListener(previousButtonString, thisContestNum, thisContestValue, prevContestNum));
+            col2.appendChild(setupNavigationButtonListener(nextButtonString, thisContestNum, thisContestValue, nextContestNum));
+            row.appendChild(col1);
+            row.appendChild(col2);
+            table.appendChild(row);
             // Add to the DOM
-            newList.appendChild(newButton);
-            bottomElement.appendChild(newList);
+            bottomElement.appendChild(table);
         }
 
         // Helper function for pretty printing selections
@@ -577,7 +603,7 @@
                         if (!max) {
                             max = Object.values(contest)[0].choices.length;
                         }
-                        if (selections.length == 0) {
+                        if (!selections || selections.length == 0) {
                             box2.innerHTML = "no selection - skipped";
                             box2.classList.add("novotedText");
                         } else {
@@ -640,18 +666,17 @@
         // Setup a new contest.  Note - when navigating to a new contest,
         // the previous contest selection data is gone by the time this
         // is called.  Just being clear about that.
-        function setupNewContest(thisContest) {
-            console.log("Running setupNewContest: contest " + thisContest);
-            let nextContest = thisContest + 1;
-            let thisContestName = Object.keys(listOfContests[thisContest])[0];
-            let thisContestValue = Object.values(listOfContests[thisContest])[0];
+        function setupNewContest(thisContestNum) {
+            console.log("Running setupNewContest: contest " + thisContestNum);
+            let thisContestName = Object.keys(listOfContests[thisContestNum])[0];
+            let thisContestValue = Object.values(listOfContests[thisContestNum])[0];
 
             // and initialize them
-            setProgressBarColor(thisContest, "activeContest");
-            setActiveContest(thisContest);
+            setProgressBarColor(thisContestNum, "activeContest");
+            setActiveContest(thisContestNum);
 
             // Setup the upper and lower sections
-            setUpperSection(thisContest, thisContestName, thisContestValue);
+            setUpperSection(thisContestNum, thisContestName, thisContestValue);
             setLowerSection(thisContestValue);
 
             // Note - for the moment let these be globals (until we know more).
@@ -672,7 +697,7 @@
 
             // Restore previous votes.  Note - the above setUpperSection clears
             // everything out, so to restore we only need to add the classes
-            // to the correct li
+            // to the correct li - if there is something.
             if (thisContestValue.selection) {
                 // loop over selection in order
                 for (const selection of thisContestValue.selection) {
@@ -700,11 +725,7 @@
             // Setup the bottomSection - this supplies simply "next context/checkout"
             // navigation.  Note - the voter's selection is saved when navigating away
             // from the page - hence it needs _this_ thisContestValue.
-            let nextButtonString = "Go to next contest";
-            if (nextContest >= numberOfContests) {
-                nextButtonString = "Go to checkout";
-            }
-            setupNextButtonListener(nextButtonString, nextContest, thisContestValue);
+            setupBottomNavigation(thisContestNum, thisContestNum + 1, thisContestValue);
         }
 
         // If here, this is the first contest
