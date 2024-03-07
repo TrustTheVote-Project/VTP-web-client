@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Landing Page - User Story 1</title>
+        <style>
+         /* box debugging
+          * {
+	    border-style: solid;
+	    border-color: red;
+            }
+          */
+        </style>
+    </head>
+    <body>
+        <h2>Welcome to a VoteTrackr+ Demo</h2>
+        <p>This is a simulated conceptual demo of what voting in an election that is
+            integrated with the VoteTrackr+ technology</p>
+        <p>You may vote as many times as you would like</p>
+        <p>Please click the continue button to start voting</p>
+        <p></p>
+        <p></p>
+        <p></p>
+        <button id="vote" >Vote</button>
+
+        <script>
+         document.getElementById("vote").onclick = function () {
+             window.location.href = "voting.html";
+         };
+        </script>
+    </body>
+</html>

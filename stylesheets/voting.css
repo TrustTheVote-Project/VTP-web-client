@@ -1,0 +1,110 @@
+/* Set the overall styles for the progress bar */
+#progressBar {
+    display: flex;
+    height: 20px;
+    width: 100%;
+    text-align: center;
+    background-color: #E5E4E2;
+}
+#youAreHereBar {
+    display: flex;
+    height: 20px;
+    width: 100%;
+    text-align: center;
+}
+
+/* colors for completely voted and undervoted and novoted */
+.novotedText {
+    color: #FF6B6B;
+}
+.undervotedText {
+    color: #FFD166;
+}
+.votedText {
+    color: #6EE7B7;
+}
+.novotedBG {
+    background-color: #FF6B6B;
+}
+.undervotedBG {
+    background-color: #FFD166;
+}
+.votedBG {
+    background-color: #6EE7B7;
+}
+.activeContest {
+    background-color: white;
+}
+
+/* Each section (class) gets an individual black border */
+.progSection {
+    flex: 1; /* Equal distribution of space */
+    border-right: 1px solid black;
+}
+.yrhSection {
+    flex: 1; /* Equal distribution of space */
+}
+
+/* when a plurality candidate is selected or not */
+.selected {
+    background-color: #D5F5E3;
+}
+.unselected {
+    background-color: #f5f5f5;
+}
+
+/* the incoming choices */
+#choiceList li {
+    margin: 10px;
+    padding: 15px;
+    border: 1px solid #dfdfdf;
+    list-style-type: none;
+}
+
+/* in RCV the selection is a sortable list - the defaults */
+#sortableList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#sortableList li {
+    margin: 10px;
+    padding: 15px;
+    border: 1px solid #dfdfdf;
+    background: #f5f5f5;
+}
+
+#sortableList li.hint {
+    border: 1px solid #ffc49a;
+    background: #feffb4;
+}
+
+#sortableList li.active {
+    border: 1px solid #ffa5a5;
+    background: #ffe7e7;
+}
+
+/* bottom section */
+.noBullets {
+    list-style-type: none;
+}
+
+/* flexbox for the checkout page selection box */
+.selectionFlexContainer {
+    display: flex;
+}
+.tableStyle {
+    padding: 0;
+    margin: 0;
+}
+
+/* For JSON pretty printing */
+pre {outline: 1px solid #ccc; padding: 5px; margin: 5px; }
+.JSONstring { color: green; }
+.JSONnumber { color: darkorange; }
+.JSONboolean { color: blue; }
+.JSONnull { color: magenta; }
+.JSONkey { color: red; }
+
+</style>
