@@ -98,4 +98,13 @@
     padding: 0;
     margin: 0;
 }
+
+/* For JSON pretty printing */
+pre {outline: 1px solid #ccc; padding: 5px; margin: 5px; }
+.JSONstring { color: green; }
+.JSONnumber { color: darkorange; }
+.JSONboolean { color: blue; }
+.JSONnull { color: magenta; }
+.JSONkey { color: red; }
+
 </style>

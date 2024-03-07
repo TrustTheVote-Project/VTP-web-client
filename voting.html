@@ -548,6 +548,63 @@
             bottomElement.appendChild(table);
         }
 
+        // Helper function to color JSON
+        function syntaxHighlight(jsonString) {
+            let newString = jsonString.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            newString = jsonString.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+                var cls = 'JSONnumber';
+                if (/^"/.test(match)) {
+                    if (/:$/.test(match)) {
+                        cls = 'JSONkey';
+                    } else {
+                        cls = 'JSONstring';
+                    }
+                } else if (/true|false/.test(match)) {
+                    cls = 'JSONboolean';
+                } else if (/null/.test(match)) {
+                    cls = 'JSONnull';
+                }
+                return '<span class="' + cls + '">' + match + '</span>';
+            });
+            return newString;
+        }
+
+        // Setup the chechout page vote button
+        function setupVoteButtonListener(buttonString, rootElement) {
+            const newItem = document.createElement("div");
+            // Create a next/checkout button
+            const newButton = document.createElement("button");
+            newButton.innerText = buttonString;
+            // add an event listener to the button
+            newButton.addEventListener("click", function (e) {
+                console.log("Running '" + buttonString + "' eventListener");
+                if (buttonString == "VOTE") {
+                    // Send the blankBallot object to the web-api endpoint.
+                    // ZZZ
+                    // For now, just print it to the page
+                    let jsonString = JSON.stringify(blankBallot, undefined, 2);
+                    rootElement.appendChild(document.createElement('pre')).innerHTML = syntaxHighlight(jsonString);
+                } else if (buttonString == "Spoil Ballot") {
+                    // For now, just print something, destroy the blankBallot,
+                    // and go to home page
+                    blankBallot = null;
+                    const newItem = document.createElement("p");
+                    newItem.innerHTML = "Your ballot has been destroyed.  To vote, click the start over button below";
+                    rootElement.appendChild(newItem);
+                    // window.location.href = "voting.html";
+                    const startOverButton = document.createElement("button");
+                    startOverButton.innerText = "Start over";
+                    startOverButton.onclick = function () {
+                        window.location.href = "index.html";
+                    };
+                    rootElement.appendChild(startOverButton);
+                } else {
+                    alert("Unsupported/unimplemented function '" + buttonString + "'");
+                }
+            });
+            return newButton;
+        }
+
         // Setup the progressBar navigation buttons.  Design note - as the
         // design of this fell into place (!), the code to store the voter's
         // selection ended up being placed in the event listener that
@@ -683,7 +740,7 @@
                 }
             }
 
-            // 3) For the demo, create two buttons for now: vote and spoil.
+            // 3) For the demo, create two buttons for now: spoil and vote.
             //    Spoil returns to the welcome page (index.html) without
             //    voting.  Vote submits the ballot and proceeds to the VTP
             //    part of the demo.  Voting:
@@ -692,7 +749,16 @@
             //    - when integrated with the web-api, will send the modified
             //      blankBallot.json which will re-verify the ballot and
             //      casts it, returning the ballot receipt and row number
-
+            const spoilButton = setupVoteButtonListener("Spoil Ballot", rootElement);
+            const voteButton = setupVoteButtonListener("VOTE", rootElement);
+            // Create the table and add it
+            const voteTable = document.createElement("table");
+            voteTable.classList.add("tableStyle");
+            const row1 = document.createElement("tr");
+            row1.appendChild(spoilButton);
+            row1.appendChild(voteButton);
+            voteTable.appendChild(row1);
+            rootElement.appendChild(voteTable);
         }
 
         // Setup a new contest.  Note - when navigating to a new contest,
