@@ -569,6 +569,11 @@
             return newString;
         }
 
+        function nullifySession() {
+            blankBallot = null;
+            listOfContests.length = 0;
+        }
+
         // Setup the chechout page vote button
         function setupVoteButtonListener(buttonString, rootElement) {
             const newItem = document.createElement("div");
@@ -584,10 +589,12 @@
                     // For now, just print it to the page
                     let jsonString = JSON.stringify(blankBallot, undefined, 2);
                     rootElement.appendChild(document.createElement('pre')).innerHTML = syntaxHighlight(jsonString);
+                    // ZZZ for the demo, destroy the blankBallot as well
+                    nullifySession();
                 } else if (buttonString == "Spoil Ballot") {
                     // For now, just print something, destroy the blankBallot,
                     // and go to home page
-                    blankBallot = null;
+                    nullifySession();
                     const newItem = document.createElement("p");
                     newItem.innerHTML = "Your ballot has been destroyed.  To vote, click the start over button below";
                     rootElement.appendChild(newItem);
@@ -755,8 +762,13 @@
             const voteTable = document.createElement("table");
             voteTable.classList.add("tableStyle");
             const row1 = document.createElement("tr");
-            row1.appendChild(spoilButton);
-            row1.appendChild(voteButton);
+            const col1 = document.createElement("td");
+            const col2 = document.createElement("td");
+            col2.innerHTML = "&nbsp&nbsp";
+            col1.appendChild(spoilButton);
+            col2.appendChild(voteButton);
+            row1.appendChild(col1);
+            row1.appendChild(col2);
             voteTable.appendChild(row1);
             rootElement.appendChild(voteTable);
         }
