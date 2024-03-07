@@ -102,10 +102,11 @@
 
         // Define a YouAreThere inline glyph
         const yrhIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-        yrhIcon.setAttribute("width", "18");
-        yrhIcon.setAttribute("height", "18");
+        yrhIcon.setAttribute("width", "20");
+        yrhIcon.setAttribute("height", "20");
         yrhIcon.setAttribute("viewBox", "0 0 32 32");
         yrhIcon.setAttribute("fill", "currentColor");
+        yrhIcon.setAttribute("color", "black");
         yrhIcon.innerHTML = `<path d="M26.221 16c0-7.243-5.871-13.113-13.113-13.113s-13.113 5.87-13.113 13.113c0 7.242 5.871 13.113 13.113 13.113s13.113-5.871 13.113-13.113zM1.045 16c0-6.652 5.412-12.064 12.064-12.064s12.064 5.412 12.064 12.064c0 6.652-5.411 12.064-12.064 12.064-6.652 0-12.064-5.412-12.064-12.064z"></path><path d="M18.746 15.204l0.742-0.742-6.379-6.379-6.378 6.379 0.742 0.742 5.112-5.112v12.727h1.049v-12.727z"></path>`;
 
         // Will set up the progress bars with numberOfContests contests
@@ -538,6 +539,7 @@
             const col1 = document.createElement("td");
             const col2 = document.createElement("td");
             col1.appendChild(setupNavigationButtonListener(previousButtonString, thisContestNum, thisContestValue, prevContestNum));
+            col2.innerHTML = "&nbsp&nbsp";
             col2.appendChild(setupNavigationButtonListener(nextButtonString, thisContestNum, thisContestValue, nextContestNum));
             row.appendChild(col1);
             row.appendChild(col2);
@@ -681,18 +683,16 @@
                 }
             }
 
-            // 3) Create two buttons.  The first is a simply vote button.  The
-            // second is a vote button that also momentarily returns the voter's
-            // row offset.  Create both and place then in a flex-box row.
+            // 3) For the demo, create two buttons for now: vote and spoil.
+            //    Spoil returns to the welcome page (index.html) without
+            //    voting.  Vote submits the ballot and proceeds to the VTP
+            //    part of the demo.  Voting:
+            //    - prints the cast-ballot to the page (for now) - can just
+            //      continue appending to rootElement
+            //    - when integrated with the web-api, will send the modified
+            //      blankBallot.json which will re-verify the ballot and
+            //      casts it, returning the ballot receipt and row number
 
-            // When either button is clicked:
-            //    - print the selections to the console
-            //    - send the modified blankBallot.json to the web-api that will
-            //      cast the voter's ballot and return the ballot receipt and
-            //      optionally return the voter's row index.
-
-            // Place the two buttons in the bottomSection
-            // ZZZ
         }
 
         // Setup a new contest.  Note - when navigating to a new contest,
