@@ -8,7 +8,7 @@ Displays a short welcome and help message that briefly explains the standard con
 
 ## User Story 2 - voting
 
-#### What happens when the voter starts to mark the ballot (votes)?
+#### What happens when the voter starts to actually mark the ballor, a.k.a. vote?
 
 Displays the first contest.  At the moment two types of contests are supported, plurality and IRV (RCV).
 
@@ -25,51 +25,50 @@ If IRV/RCV:
 
 Common buttons/actions/UI:
 
-- there is a __DE-SELECT ALL__ button somewhere in the lower left portion of the page
 - there is a __CONTINUE__ button somewhere in the lower right portion of the page
-  - if the continue button is activated and there is an undervote situation, a warning window appears that allows the user to go to the next contest or stay with the current contest
 - across the top is a horizontal progress bar divided into equal width sections by contest
   - each contest is clickable and takes the user to that contest
-    - if there is an undervote in the current contest, a proceed-able warning window appears
-  - in the completion bar, completed contests are solid bright green, undervote contests are solid somewhat dimm yellow, and no-vote or undervote contests that are to the left of any green or yellow contest are red outlined boxes.
-- immediately below the progress bar in the left corner is a __PREVIOUS CONTEST__ button
-- immediately below the progress bar in the right corner is a __NEXT CONTEST__ button
+  - in the progress bar, completed contests are green, undervote contests are yellow, and no-vote contests are red
+- there is a __PREVIOUS CONTEST__ button in the lower left
+- there is a __NEXT CONTEST__ to the right of the previous contest button
   - when the last contest in focus, the upper right button says __CHECKOUT__
-- when the __CHECKOUT__ box is clicked, all the contests are displayed with only two buttons: __GO BACK__ and __THIS IS MY VOTE__
-  - __GO BACK__ goes to the previous page with the checkout box in the upper right
-  - __THIS IS MY VOTE__ submits the ballot
+- when the __CHECKOUT__ box is clicked, all the contests are displayed with two buttons: __Spoil Ballot__ and __VOTE__
 
-Note that the backend python server side will re-validate the incoming ballot CVR.  The __THIS IS MY VOTE__ entrypoint can return various errors to the user:
+Note that the backend python server side will re-validate the incoming ballot CVR.  The __VOTE__ entrypoint can return various errors to the user:
 
 - a non compliant contest selection was found
 - there was a problem on the server side
 
-If there is no error, the endpoint returns:
-
-- the voter's ballot check as if it were paper (no links) but with the QR code being a valid link (into the voter's backend server's still active git workspace)
-- the voter's row offset into the ballot check is temporarily displayed
-- in addition there is, for demo purposes only, two additional buttons on this page
-  - a __VERIFY BALLOT RECEIPT__ button
-  - a __TALLY CONTESTS__ button
+If there is no error, the endpoint returns the ballot receipt, taking the user to the receipt.html page.
 
 ## User Story 3 - inspecting the ballot check/QR code
 
-#### What happens when the user clicks the QR code (or takes a photo of the QR code)?
+#### What happens when the user successfully submits a ballot or follows the QR code on a paper ballot?
 
-Displays the git repo copy of the contents of the ballot check.  All the digests are active links to the actual git digests for a specific vote for a specific contest.
+That specific ballot receipt is displayed.  If voting, the voter's row offset into the ballot check is temporarily displayed.  If a QR code is being followed, just the page is displayed.
 
-## User Story 4 - verifying the ballot check
+- links:
+  - each digest is clickable - takes the user to that contest-cvr.html page
+    - the contest-cvr.html contains links into the tally-contest.html page with digest tracking
+  - each row heading is clickable - takes the user to that verify-ballot-check.html page
+  - each column heading is clickable - takes the user to that tally-election.html page (no digest tracking)
+  
+See ProjectPlan.md - receipt.html
+
+## User Story 4 - inspecting contest CVRs
+
+#### What happens when the user wants to inspect a specific contest CVR?
+
+TBD - see ProjectPlan.md - contest-cvr.html
+
+## User Story 5 - verifying the ballot check
 
 #### What happens when the user wants to verify their ballot check?
 
-The user clicks the __VERIFY BALLOT RECEIPT__ (end of User Story 1) and a new page displays the 'console log' output of that function with digests hyperlinked.  The output page contains a few by default blank fields that the user can optionally fill in.  One of them is a row offset.
+TBD - see ProjectPlan.md - verify-ballot-check.html
 
-The page contains a __RE-VERIFY__ button that re-verifies the receipt honoring the new values in the various fields.
-
-## User Story 5 - tallying the election
+## User Story 6 - tallying the election
 
 #### What happens when the user wants to tally the election?
 
-The user clicks the __TALLY CONTESTS__ button (end of User Story 1) and a new page displays the 'console log' output of that function with digests hyperlinked.  The output page contains a few by default blank fields that the user can optionally fill in.  One of them is a row offset.
-
-The page contains a __RE-TALLY CONTESTS__ button that re-tallies the election honoring the new values in the various fields.
+TBD - see ProjectPlan.md - tally-election.html

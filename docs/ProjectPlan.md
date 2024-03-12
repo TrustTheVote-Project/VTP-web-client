@@ -47,7 +47,7 @@ which leaves 3 weeks of buffer
 
 #### 5. File layout (this git repo <-> end user web server)
 
-Given the decomposition into [5 user stories](./DesingNotes.md), out-of-the-gate associate different html pages with each user story.
+Given the decomposition into [6 user stories](./DesingNotes.md), out-of-the-gate associate different html pages with each user story.
 
 1. index.html
  - the landing page
