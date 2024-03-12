@@ -12,12 +12,11 @@ See the VoteTracker+ [project page](https://github.com/orgs/TrustTheVote-Project
 
 Summary of the VTP git repo's:
 
-The [VTP-dev-end](https://github.com/TrustTheVote-Project/VTP-dev-env) holds/defines the development/run-time environment.  Contained within VTP-dev-end as submodules are three repos:
+The [VTP-dev-end](https://github.com/TrustTheVote-Project/VTP-dev-env) holds/defines the VTP development/run-time environment, including the election data repo(s) of choice.  Contained within VTP-dev-end as submodules are four repos:
 - [VTP-mock-election.US.15](https://github.com/TrustTheVote-Project/VTP-mock-election.US.15) - contains the election configuration and data
 - [VTP-web-api](https://github.com/TrustTheVote-Project/VTP-web-api) - contains the FASTapi rest interface
 - [VoteTrackerPlus](https://github.com/TrustTheVote-Project/VoteTrackerPlus) - contains the python backend code
-
-This repo, [VTP-web-client](https://github.com/TrustTheVote-Project/VTP-web-client) contains the client frontend a.k.a. the voter's /UI/UX
+- this repo, [VTP-web-client](https://github.com/TrustTheVote-Project/VTP-web-client) contains the client frontend a.k.a. the voter's /UI/UX
 
 See [DesignNotes.md](DesignNotes.md) in this repo for details on the end user (voter) user stories 
 
@@ -27,13 +26,13 @@ The basic project plan is to stub out static versions of the various pages and w
 
 The four major milestones are:
 
-1. Create just the controls and UI without dealing with any JSON data - just get the basic html/css/JS UI controls for the five web pages (see below) working.
+1. Create just the controls and UI capability without dealing with any JSON data - just get the basic html/css/JS UI controls working in test cases.  Milestone 1 is basically about coming up to some effective degree with html/css/js and hence is only one effort week.
 
-2. Add JSON decoding support and integrate with static JSON data.  This includes reading and sending (static) JSON to a stubbed out backend.
+2. Create the 6 html pages using static JSON data.  This includes reading and sending static JSON to the screen/console.  Milestone 2 frames out the basic UX flows of the demo sans web-api interactions.
 
-3. Plug in the web-api and use actual live JSON data from the web-api
+3. Plug in the web-api and use actual live JSON data from the web-api. Milestone 3 integrates the milestone 2 flows with the backend (python code).
 
-4. Full end-to-end testing of the demo
+4. Full end-to-end testing of the demo.  Allow for re-designing UX/UI stories/flows as time permits.
 
 #### 4. Timeline
 
@@ -52,23 +51,39 @@ Given the decomposition into [5 user stories](./DesingNotes.md), out-of-the-gate
 
 1. index.html
  - the landing page
- - one js button that jumps to the (next) voting.html page
-2. voting.html
- - handles a single contest
- - provides navigation to previous, next, other contests (same page), and to the checkout.html page
- - provides progress status
-3. checkout.html
- - allows the voter to double check their ballot prior to casting
- - does not support editing the ballot
- - provides three options: spoil ballot (exit), edit ballot (back to voting.html), and submit/cast ballot
-4. ballot check displaying
- - either create the JS to retrieve the data from the web-api (new endpoint), creating an explicit ballot-check.html
- - or standup a http server running somewhere that is pointing to the repo of interest for the demo.  This would probably require changing the upstream remote git repo URI to the demo LAN local git server, which would be ok as it would completely isolate the demo.
-5. verify-ballot-check.html
- - handles the output of the ballot check function (basically console log output)
- - supplies various end user functions associated with verify their ballot check - a UX TBD
-6. tally-election.html
- - handles the output of tallying the election (basically console log output)
-- initial UX target is to supply a few buttons for enabling switches and converting digests to links (back to the local LAN git server or the upstream remote - see 3 above)
+ - one button that jumps to the (next) voting.html page
+ - status: milestone 2 ✅
 
-Regarding css and javascript, created as needed in standard locations.
+2. voting.html
+ - handles voting a complete ballot
+ - provides navigation to previous, next, other contests (same page)
+ - provides progress status
+ - includes a checkout function which submits the cast ballot to the backend
+ - status: milestone 2 ✅
+
+3. receipt.html
+ - displays the ballot receipt/check
+ - for demo purposes, also momentarily displays the row number
+ - each digest is a link to the contest-cvr.html page
+ - each row index is a link to the ballot-validation.html page
+ - each column header is a link to the tally-contest.html page for that contest
+ - status:
+
+4. context-cvr.html
+ - basically displays the git log for the contest CVR commit.  No code diff - just the git log.
+ - has a button to tally the context while tracking this specific contest CVR
+ - status:
+
+5. verify-ballot-check.html
+ - will show the digests for each of the contests with the associated contest vote count NNN
+ - basically html wraps console output
+ - each digest number is a link to its contest-cvr.html page
+ - the 'vote NNN' is a link to the tally-contest.html page for this specific contest
+ - status:
+
+6. tally-election.html
+ - handles the output of tallying a contest
+ - basically wraps console output
+ - support buttons to re-run the tally with different levels of verbosity (perhaps one button for each)
+ - status:
+ 
