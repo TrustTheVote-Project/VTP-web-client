@@ -32,7 +32,7 @@ default:
 	@echo ""
 	@echo "See ${BUILD_DIR}/README.md for more details and info"
 
-# emacs tags (for javascript need GNU's universal-ctag package)
+# emacs tags (for javascript need GNU's universal-ctags package)
 .PHONY: etags
 etags:
 	/opt/homebrew/bin/ctags -e -R --language-force=javascript

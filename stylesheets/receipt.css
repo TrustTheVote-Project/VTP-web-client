@@ -1,0 +1,13 @@
+/* bottom section */
+.noBullets {
+    list-style-type: none;
+}
+
+/* flexbox for the checkout page selection box */
+.selectionFlexContainer {
+    display: flex;
+}
+.tableStyle {
+    padding: 0;
+    margin: 0;
+}
