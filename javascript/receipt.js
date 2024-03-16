@@ -25,20 +25,22 @@ function createReceiptTable(ballotCheck) {
     const caption = document.createElement("caption");
     caption.innerTest = "Ballot Check";
     table.appendChild(caption);
+    table.classList.add("receiptTable");
     for (let index = 0; index < numberOfRows; index++) {
         let row = document.createElement("tr");
         if (index == 0 || (index % 34 == 0)) {
             // table header line
+            let innerText = "";
             for (let colIndex = 0; colIndex <  numberOfColumns; colIndex++) {
-                const tableHeader = document.createElement("th");
-                const anchor =  document.createElement("a");
-                const contest = "ZZZ";
-                anchor.setAttribute("href", "tally-election.html?contest=" + contest);
-                anchor.setAttribute("target", "_blank");
-                anchor.appendChild(document.createTextNode(ballotCheck[0][colIndex]));
-                tableHeader.appendChild(anchor);
-                row.appendChild(tableHeader);
+                let headerText = "";
+                if (colIndex == 0) {
+                    headerText = `<th>${ballotCheck[0][0]}</th>`;
+                } else {
+                    headerText = `<th><a  href="tally-election.html?contest=${ballotCheck[0][colIndex].split('<br>', 2)[0]}" target="_blank">${ballotCheck[0][colIndex].split('<br>', 2)[1]}</a></th>`;
+                }
+                innerText += headerText;
             }
+            row.innerHTML = innerText;
             table.appendChild(row);
             // If this is the first table header, loop
             if (index == 0) {
@@ -49,26 +51,16 @@ function createReceiptTable(ballotCheck) {
         }
         // normal ballot receipt line
         // First column is a verify-ballot-check.html link
-        const td = document.createElement("td");
-        const rowHeader = document.createElement("a");
-        rowHeader.setAttribute("target", "_blank");
-        rowHeader.appendChild(document.createTextNode(index));
-        td.appendChild(rowHeader);
-        row.appendChild(td);
+        let innerText = "";
         // The other columns are digest links
         let digests = [];
         for (let colIndex = 1; colIndex <  numberOfColumns; colIndex++) {
             const digest = ballotCheck[index][colIndex];
-            const td = document.createElement("td");
-            const anchor =  document.createElement("a");
             digests.push(digest);
-            anchor.setAttribute("href", "contest-cvr.html?digest=" + digest);
-            anchor.setAttribute("target", "_blank");
-            anchor.appendChild(document.createTextNode(digest));
-            td.appendChild(anchor);
-            row.appendChild(td);
+            innerText += `<td><a target="_blank" class="receiptTD" href="contest-cvr.html?digest=${digest}">${digest}</a></td>`;
         }
-        rowHeader.setAttribute("href", "verify-ballot-check.html?digests=" + digests.join(","));
+        innerText = `<th><a target="_blank" class="receiptTH" href="verify-ballot-check.html?digests=${digests.join(',')}">${index}</a></th>${innerText}`;
+        row.innerHTML = innerText;
         table.appendChild(row);
     }
     rootElement.appendChild(table);

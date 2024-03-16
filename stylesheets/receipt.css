@@ -1,14 +1,10 @@
-table {
+.receiptTable {
     border-collapse: collapse;
     border-spacing: 1px;
-    border: 1px black;
     outline: 1px black;
 }
 
-td {
-    border: 1px solid black;
-    text-align: center;
-    vertical-align: middle;
+.receiptTD, .receiptTH {
 }
 
 td:hover {
