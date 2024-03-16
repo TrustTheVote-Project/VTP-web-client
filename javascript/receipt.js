@@ -70,7 +70,7 @@ function eraseRowNumber() {
     const rootElement = document.getElementById("rowNumber");
     rootElement.classList.remove("visible");
     rootElement.classList.add("hidden");
-    ballotRow = null;
+    ballotRow = "";
 }
 
 // create the table
