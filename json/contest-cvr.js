@@ -43,5 +43,5 @@ const contestCvrJSON = `{
             "tally": "rcv",
             "uid": "0001"
         }
-    },
-}`
+    }
+}`;

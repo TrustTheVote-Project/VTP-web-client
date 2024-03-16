@@ -4,9 +4,9 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="stylesheets/receipt.css">
-        <script defer src="json/ballot-receipt.js"></script>
-        <script defer src="javascript/receipt.js"></script>
-        <title>The ballot receipt - User Story 3</title>
+        <script defer src="json/contest-cvr.js"></script>
+        <script defer src="javascript/contest-cvr.js"></script>
+        <title>The contest CVR - User Story 4</title>
         <style>
         /* box debugging
          * {
@@ -21,18 +21,13 @@
              Nominally this is where help text is placed
         -->
         <div id="upperSection"></div>
-        <h2>This is a ballot check</h2>
+        <h2>This is a Cast Vote Record (CVR)</h2>
         <ul>
-            <li>Clicking a contest digest will display that contest</li>
-            <li>Clicking the row index will validate that row of contests</li>
-            <li>Clicking the column header will tally that contest</li>
+            <li>Clicking a digest will tally the contest following this CVR</li>
         </ul>
         <!-- If there is a row number, will display this line
              and will fade out the row number is 3 seconds
         -->
-        <table><tr><th>
-        <h2>Your row number is: <span id="hide" class="visible">
-            <span id="rowNum">null</span></span></span></h2></th><th>&nbsp&nbsp(disappears in 3 seconds)</th></tr></table>
 
         <!-- The lower span start here.
              This is the location of the ballot check itself
