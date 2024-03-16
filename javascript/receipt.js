@@ -66,5 +66,15 @@ function createReceiptTable(ballotCheck) {
     rootElement.appendChild(table);
 }
 
+function eraseRowNumber() {
+    const rootElement = document.getElementById("rowNumber");
+    rootElement.classList.remove("visible");
+    rootElement.classList.add("hidden");
+    ballotRow = null;
+}
+
 // create the table
 createReceiptTable(ballotCheck);
+
+// Erase row number
+eraseRowNumber();

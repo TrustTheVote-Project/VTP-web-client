@@ -14,3 +14,19 @@ td:hover {
     z-index:1;
     padding:1px;
 }
+
+.fadeOut1 {
+    animation: fadeOut 5s;
+}
+
+/* From: https://fvsch.com/articles/transition-fade/test5.html */
+.visible {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 2s linear;
+}
+.hidden {
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s 2s, opacity 2s linear;
+}

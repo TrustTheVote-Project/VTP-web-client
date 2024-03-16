@@ -1,4 +1,4 @@
-const row = 42;
+var balllotRow = 42;
 const ballotCheckJSON = `[
     ["Index", "0000<br>U.S. President", "0001<br>U.S. Senate", "0002<br>Governor", "0003<br>County Clerk", "0004<br>Question 1 - should the starting time of the annual town meeting be moved to 6:30 PM?"],
     [1, "5ce9fcd4d308dc9dc5978b8d54939bfa6547cc7c", "f16f582cc51647bcb46325e6e97bbdde41bdfff3", "41b896980705d38b9937aaf717df7bc08aebde0b", "b646663ad96d0311b986a4339b08fc66e0d03f72", "91d7f5dd1da79582ce42ce8393e4645ea8ce7ed6"],
@@ -101,4 +101,4 @@ const ballotCheckJSON = `[
     [98, "e9d38ec8100a6e6e1d5996da5998275a8b99219b", "848947d9b2fae7583a851838cb6b9e7cac62cfd2", "509cc1cc9e0a587afa99ab6facd30782c86327ad", "b285fdae569b6a0721508e10d1e0fa0355401a24", "5423e97b04fd9ea8b4b3ccb68abc0505b4ddd589"],
     [99, "522d92fbde28b0b48055798573cb3f4f7702a7c1", "eb9c73f4d10ad526f0b1d2516c43373e89584187", "b50d49e6e515ed352513c4017239d709ebbdc4d1", "19d0f6e0154d446ffa297c0ebf68752c83e24510", "c1a7118be1f7c8cd13e1241f89225ea3c593d5b3"],
     [100, "6aa10ad2d1c8799cf871150a0eaa96706dd8d347", "774795786dade04c95386d1b041ac1065b5179cd", "2169b2d07b8be74db436bce97ce68495e772ca84", "dcf50e29b41e611edbbb9538fab893b11881a5f3", "6190ed494deab9f6c104b31c0c3d4285fc219c8c"]]`;
-const qr_svg = "TBD";
+const ballotQR = "TBD";
