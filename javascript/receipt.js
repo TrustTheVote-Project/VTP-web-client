@@ -2,9 +2,9 @@
 
 // Need the JSON data for just about everything
 // Create the ballotCheck javascript object from the blankBallotJSON JSON object literal
-var ballotCheck = null;
+var outerJSON = null;
 try {
-    ballotCheck = JSON.parse(ballotCheckJSON);
+    outerJSON = JSON.parse(ballotReceiptJSON);
 } catch (e) {
     console.error(e);
 }
@@ -67,14 +67,27 @@ function createReceiptTable(ballotCheck) {
 }
 
 function eraseRowNumber() {
-    const rootElement = document.getElementById("rowNumber");
+    const rootElement = document.getElementById("hide");
     rootElement.classList.remove("visible");
     rootElement.classList.add("hidden");
-    ballotRow = "";
+    outerJSON["ballotRow"] = null
 }
 
+function setRowNumber(ballotRow) {
+    document.getElementById("rowNum").innerText = ballotRow;
+}
+
+// Set row number
+setRowNumber(outerJSON["ballotRow"]);
+
 // create the table
-createReceiptTable(ballotCheck);
+createReceiptTable(outerJSON["ballotCheck"]);
 
 // Erase row number
-eraseRowNumber();
+window.addEventListener("load", function() {
+    // loaded
+    eraseRowNumber();
+    setTimeout(() => {
+        setRowNumber(null);
+    }, 3000);
+}, false);

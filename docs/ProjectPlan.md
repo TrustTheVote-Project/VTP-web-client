@@ -67,7 +67,7 @@ Given the decomposition into [6 user stories](./DesingNotes.md), out-of-the-gate
  - each digest is a link to the contest-cvr.html page
  - each row index is a link to the ballot-validation.html page
  - each column header is a link to the tally-contest.html page for that contest
- - status:
+ - status: milestone 2 ✅
 
 4. context-cvr.html
  - basically displays the git log for the contest CVR commit.  No code diff - just the git log.
