@@ -25,14 +25,18 @@ function createReceiptTable(ballotCheck) {
     const caption = document.createElement("caption");
     caption.innerTest = "Ballot Check";
     table.appendChild(caption);
-    table.classList.add("tableStyle");
     for (let index = 0; index < numberOfRows; index++) {
-        const row = document.createElement("tr");
+        let row = document.createElement("tr");
         if (index == 0 || (index % 34 == 0)) {
             // table header line
             for (let colIndex = 0; colIndex <  numberOfColumns; colIndex++) {
                 const tableHeader = document.createElement("th");
-                tableHeader.innerText = ballotCheck[0][colIndex];
+                const anchor =  document.createElement("a");
+                const contest = "ZZZ";
+                anchor.setAttribute("href", "tally-election.html?contest=" + contest);
+                anchor.setAttribute("target", "_blank");
+                anchor.appendChild(document.createTextNode(ballotCheck[0][colIndex]));
+                tableHeader.appendChild(anchor);
                 row.appendChild(tableHeader);
             }
             table.appendChild(row);
@@ -40,6 +44,8 @@ function createReceiptTable(ballotCheck) {
             if (index == 0) {
                 continue;
             }
+            // if still here, create a new row
+            row = document.createElement("tr");
         }
         // normal ballot receipt line
         // First column is a verify-ballot-check.html link
@@ -52,14 +58,14 @@ function createReceiptTable(ballotCheck) {
         // The other columns are digest links
         let digests = [];
         for (let colIndex = 1; colIndex <  numberOfColumns; colIndex++) {
-            const td = document.createElement("td");
-            const column =  document.createElement("a");
             const digest = ballotCheck[index][colIndex];
+            const td = document.createElement("td");
+            const anchor =  document.createElement("a");
             digests.push(digest);
-            column.setAttribute("href", "contest-cvr.html?digest=" + digest);
-            column.setAttribute("target", "_blank");
-            column.appendChild(document.createTextNode(digest));
-            td.appendChild(column);
+            anchor.setAttribute("href", "contest-cvr.html?digest=" + digest);
+            anchor.setAttribute("target", "_blank");
+            anchor.appendChild(document.createTextNode(digest));
+            td.appendChild(anchor);
             row.appendChild(td);
         }
         rowHeader.setAttribute("href", "verify-ballot-check.html?digests=" + digests.join(","));
