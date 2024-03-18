@@ -3,8 +3,9 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="stylesheets/receipt.css">
+        <link rel="stylesheet" href="stylesheets/voting.css">
         <script defer src="json/contest-cvr.js"></script>
+        <script defer src="javascript/common.js"></script>
         <script defer src="javascript/contest-cvr.js"></script>
         <title>The contest CVR - User Story 4</title>
         <style>
@@ -23,19 +24,16 @@
         <div id="upperSection"></div>
         <h2>This is a Cast Vote Record (CVR)</h2>
         <ul>
-            <li>Clicking a digest will tally the contest following this CVR</li>
+            <li>Clicking a digest will tally the contest following that CVR</li>
         </ul>
-        <!-- If there is a row number, will display this line
-             and will fade out the row number is 3 seconds
-        -->
-
         <!-- The lower span start here.
-             This is the location of the ballot check itself
+             This is where the CVR is displayed
         -->
         <div id="lowerSection"></div>
 
         <!-- The bottom span start here.
-             Any bottom buttons can be placed here
+             Any bottom buttons can be placed here - for UX
+             perhaps a tally button
         -->
         <div id="bottomSection"></div>
     </body>

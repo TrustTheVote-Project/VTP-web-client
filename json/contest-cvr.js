@@ -1,4 +1,4 @@
-const contestCvrJSON = `{
+const contestCVRJSON = `{
     "commit": "4a99ccefbd96e51d7cc2730d9b107df1512d7b84",
     "Author": "Sandy Currier <windoverwater@users.noreply.github.com>",
     "Date": "Sat Jan 1 12:00:00 2022 -0500",

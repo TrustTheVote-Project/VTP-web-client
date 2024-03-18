@@ -15,18 +15,14 @@ td:hover {
     padding:1px;
 }
 
-.fadeOut1 {
-    animation: fadeOut 5s;
-}
-
 /* From: https://fvsch.com/articles/transition-fade/test5.html */
 .visible {
   visibility: visible;
   opacity: 1;
-  transition: opacity 3s linear;
+  transition: opacity 5s linear;
 }
 .hidden {
   visibility: hidden;
   opacity: 0;
-  transition: visibility 0s 3s, opacity 3s linear;
+  transition: visibility 0s 5s, opacity 5s linear;
 }

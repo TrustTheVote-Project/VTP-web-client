@@ -89,5 +89,5 @@ window.addEventListener("load", function() {
     eraseRowNumber();
     setTimeout(() => {
         setRowNumber(null);
-    }, 3000);
+    }, 5000);
 }, false);
