@@ -16,5 +16,30 @@ function displayLog(contestCVR, digestURL) {
     rootElement.appendChild(document.createElement('pre')).innerHTML = syntaxHighlight(jsonString, digestURL);
 }
 
-// go
+// Adds an explicit tally button
+function addTallyButton(digest) {
+    const rootElement = document.getElementById("upperSection");
+    const tallyButton = document.createElement("button");
+    tallyButton.innerText = "Tally Contest";
+    tallyButton.id = "tallyContest";
+    // add an event listener to the button
+    tallyButton.addEventListener("click", function (e) {
+        console.log("Running 'Tally Contest' button");
+        window.open(`tally-contests.html?digests=${digest}`, "_blank").focus();
+    });
+    const table = document.createElement("table");
+    table.classList.add("tableStyle");
+    const row = document.createElement("tr");
+    const col = document.createElement("td");
+    col.innerHTML = "&nbsp&nbsp";
+    col.appendChild(tallyButton);
+    row.appendChild(col);
+    table.appendChild(row);
+    rootElement.appendChild(table);
+}
+
+// Get the git log
 displayLog(outerJSON, "tally-contest.html");
+
+// Add a button
+addTallyButton(outerJSON.commit);

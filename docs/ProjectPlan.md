@@ -72,7 +72,7 @@ Given the decomposition into [6 user stories](./DesingNotes.md), out-of-the-gate
 4. context-cvr.html
  - basically displays the git log for the contest CVR commit.  No code diff - just the git log.
  - has a button to tally the context while tracking this specific contest CVR
- - status:
+ - status: milestone 2 ✅
 
 5. verify-ballot-check.html
  - will show the digests for each of the contests with the associated contest vote count NNN
