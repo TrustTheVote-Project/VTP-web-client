@@ -13,11 +13,11 @@ try {
 function displayLog(contestCVR, digestURL) {
     const rootElement = document.getElementById("lowerSection");
     let jsonString = JSON.stringify(contestCVR, undefined, 2);
-    rootElement.appendChild(document.createElement('pre')).innerHTML = syntaxHighlight(jsonString, digestURL);
+    rootElement.appendChild(document.createElement('pre')).innerHTML = syntaxHighlight(jsonString, digestURL, contestCVR.log.CVR.uid);
 }
 
 // Adds an explicit tally button
-function addTallyButton(digest) {
+function addTallyButton(contest, digest) {
     const rootElement = document.getElementById("upperSection");
     const tallyButton = document.createElement("button");
     tallyButton.innerText = "Tally Contest";
@@ -25,7 +25,7 @@ function addTallyButton(digest) {
     // add an event listener to the button
     tallyButton.addEventListener("click", function (e) {
         console.log("Running 'Tally Contest' button");
-        window.open(`tally-contests.html?digests=${digest}`, "_blank").focus();
+        window.open(`tally-contests.html?contest=${contest}&digests=${digest}`, "_blank").focus();
     });
     const table = document.createElement("table");
     table.classList.add("tableStyle");
@@ -42,4 +42,4 @@ function addTallyButton(digest) {
 displayLog(outerJSON, "tally-contest.html");
 
 // Add a button
-addTallyButton(outerJSON.commit);
+addTallyButton(outerJSON.log.CVR.uid, outerJSON.commit);
