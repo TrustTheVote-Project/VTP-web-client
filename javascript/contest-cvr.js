@@ -10,11 +10,11 @@ try {
 }
 
 // Display the git log with the necessay links
-function displayLog(contestCVR) {
+function displayLog(contestCVR, digestURL) {
     const rootElement = document.getElementById("lowerSection");
     let jsonString = JSON.stringify(contestCVR, undefined, 2);
-    rootElement.appendChild(document.createElement('pre')).innerHTML = syntaxHighlight(jsonString);
+    rootElement.appendChild(document.createElement('pre')).innerHTML = syntaxHighlight(jsonString, digestURL);
 }
 
 // go
-displayLog(outerJSON);
+displayLog(outerJSON, "tally-contest.html");
