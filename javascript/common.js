@@ -1,7 +1,7 @@
 // Color JSON strings
-function syntaxHighlight(jsonString, digestURL=null, contest=null) {
+function syntaxHighlightJSON(jsonString, digestURL=null, contestNumber=null) {
     let newString = jsonString.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    newString = jsonString.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+    newString = newString.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
         var cls = 'JSONnumber';
         if (/^"/.test(match)) {
             if (/:$/.test(match)) {
@@ -9,13 +9,13 @@ function syntaxHighlight(jsonString, digestURL=null, contest=null) {
             } else {
                 cls = 'JSONstring';
                 // Handle digest links
-                if (digestURL && contest && cls == 'JSONstring' && match) {
+                if (digestURL && contestNumber && match) {
                     //
                     let newMatch = match;
                     let link_p = false;
                     newMatch = newMatch.replace(/([a-fA-F0-9]{40})/g, function (match) {
                         link_p = true;
-                        return `<a target="_blank" href=${digestURL}?contest=${contest}&digests=${match}>${match}</a>`;
+                        return `<a target="_blank" href=${digestURL}?contestNumber=${contestNumber}&digests=${match}>${match}</a>`;
                     });
                     if (link_p) {
                         return newMatch;
@@ -31,4 +31,35 @@ function syntaxHighlight(jsonString, digestURL=null, contest=null) {
         return '<span class="' + cls + '">' + match + '</span>';
     });
     return newString;
+}
+
+// Color STDOUT log strings, which is passed as an array of strings (one per line)
+function syntaxHighlightVerify(jsonArray, digestURL=null, tallyURL=null) {
+    // Handle digest links
+    let newOutput = []
+    for (let line of jsonArray) {
+        let newLine = line;
+        let digest = false;
+        newLine = newLine.replace(/\b([a-fA-F0-9]{40})\b/, function (match) {
+            digest = match;
+            return `<a target="_blank" href=${digestURL}?digest=${digest}>${digest}</a>`;
+        });
+        if (digest) {
+            newLine = newLine.replace(/\b([0-9]{4}\b)/, function (match) {
+                return `<a target="_blank" href=${tallyURL}?contest=${match}&digests=${digest}>${match}</a>`;
+            });
+        }
+        // also handle GOOD and BAD boxes
+        if (line.match(/^\[GOOD\]/) || line == "*".repeat(12)) {
+            newLine = `<span class=good>${newLine}</span>`;
+        }
+        if (line.match(/^\[ERROR\]/) || line == "#".repeat(12)) {
+            newLine = `<span class=error>${newLine}</span>`;
+        }
+        if (line.match(/^\[WARNING\]/) || line == "=".repeat(12)) {
+            newLine = `<span class=warning>${newLine}</span>`;
+        }
+        newOutput.push(newLine);
+    };
+    return newOutput.join("<br>");
 }

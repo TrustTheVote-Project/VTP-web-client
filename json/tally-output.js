@@ -2,7 +2,7 @@ Scanned 127 contests for contest (U.S. Senate) uid=0001, tally=rcv, max_selectio
 <br><br>
 <hr width="50%"><br>
 RCV: round 0<br>
-Counted <a href="foo/825a4d261cf6ef7686a2178ae53e2def78f2bd03" target="_blank">825a4d261cf6ef7686a2178ae53e2def78f2bd03</a> as vote 38: choice=David Delta<br>
+Counted 825a4d261cf6ef7686a2178ae53e2def78f2bd03 as vote 38: choice=David Delta<br>
 Total vote count: 127<br>
   ('Emily Echo', 25)<br>
   ('Betty Beta', 24)<br>
@@ -13,8 +13,8 @@ Total vote count: 127<br>
 <br><br>
 <hr width="50%"><br>
 RCV: round 1<br>
-INSPECTING: <a href="foo/825a4d261cf6ef7686a2178ae53e2def78f2bd03" target="_blank">825a4d261cf6ef7686a2178ae53e2def78f2bd03</a> (contest=U.S. Senate) as vote 38<br>
-RCV: <a href="foo/825a4d261cf6ef7686a2178ae53e2def78f2bd03" target="_blank">825a4d261cf6ef7686a2178ae53e2def78f2bd03</a> (contest=U.S. Senate) last place pop and count (David Delta -> Emily Echo)<br>
+INSPECTING: 825a4d261cf6ef7686a2178ae53e2def78f2bd03 (contest=U.S. Senate) as vote 38<br>
+RCV: 825a4d261cf6ef7686a2178ae53e2def78f2bd03 (contest=U.S. Senate) last place pop and count (David Delta -> Emily Echo)<br>
 Total vote count: 127<br>
   ('Emily Echo', 29)<br>
   ('Anthony Alpha', 27)<br>
@@ -25,7 +25,7 @@ Total vote count: 127<br>
 <br><br>
 <hr width="50%"><br>
 RCV: round 2<br>
-INSPECTING: <a href="foo/825a4d261cf6ef7686a2178ae53e2def78f2bd03" target="_blank">825a4d261cf6ef7686a2178ae53e2def78f2bd03</a> (contest=U.S. Senate) as vote 38<br>
+INSPECTING: 825a4d261cf6ef7686a2178ae53e2def78f2bd03 (contest=U.S. Senate) as vote 38<br>
 Total vote count: 127<br>
   ('Anthony Alpha', 35)<br>
   ('Emily Echo', 33)<br>
@@ -36,7 +36,7 @@ Total vote count: 127<br>
 <br><br>
 <hr width="50%"><br>
 RCV: round 3<br>
-INSPECTING: <a href="foo/825a4d261cf6ef7686a2178ae53e2def78f2bd03" target="_blank">825a4d261cf6ef7686a2178ae53e2def78f2bd03</a> (contest=U.S. Senate) as vote 38<br>
+INSPECTING: 825a4d261cf6ef7686a2178ae53e2def78f2bd03 (contest=U.S. Senate) as vote 38<br>
 Total vote count: 127<br>
   ('Emily Echo', 45)<br>
   ('Anthony Alpha', 43)<br>
@@ -47,7 +47,7 @@ Total vote count: 127<br>
 <br><br>
 <hr width="50%"><br>
 RCV: round 4<br>
-INSPECTING: <a href="foo/825a4d261cf6ef7686a2178ae53e2def78f2bd03" target="_blank">825a4d261cf6ef7686a2178ae53e2def78f2bd03</a> (contest=U.S. Senate) as vote 38<br>
+INSPECTING: 825a4d261cf6ef7686a2178ae53e2def78f2bd03 (contest=U.S. Senate) as vote 38<br>
 Total vote count: 127<br>
 Final results for contest U.S. Senate (uid=0001):<br>
   ('Anthony Alpha', 64)<br>

@@ -503,7 +503,7 @@ function setupVoteButtonListener(buttonString, rootElement) {
             // ZZZ
             // For now, just print it to the page
             let jsonString = JSON.stringify(blankBallot, undefined, 2);
-            rootElement.appendChild(document.createElement('pre')).innerHTML = syntaxHighlight(jsonString);
+            rootElement.appendChild(document.createElement('pre')).innerHTML = syntaxHighlightJSON(jsonString);
             // ZZZ for the demo, destroy the blankBallot as well
             nullifySession();
         } else if (buttonString == "Spoil Ballot") {

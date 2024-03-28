@@ -13,7 +13,7 @@ try {
 function displayLog(contestCVR, digestURL) {
     const rootElement = document.getElementById("lowerSection");
     let jsonString = JSON.stringify(contestCVR, undefined, 2);
-    rootElement.appendChild(document.createElement('pre')).innerHTML = syntaxHighlight(jsonString, digestURL, contestCVR.Log.contestCVR.uid);
+    rootElement.appendChild(document.createElement('pre')).innerHTML = syntaxHighlightJSON(jsonString, digestURL, contestCVR.Log.contestCVR.uid);
 }
 
 // Adds an explicit tally button
@@ -42,4 +42,4 @@ function addTallyButton(contest, digest) {
 displayLog(outerJSON, "tally-contest.html");
 
 // Add a button
-addTallyButton(outerJSON.log.CVR.uid, outerJSON.commit);
+addTallyButton(outerJSON.Log.contestCVR.uid, outerJSON.commit);
