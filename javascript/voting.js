@@ -22,17 +22,13 @@ var selectedCount = 0;
 const selectBackgroundColor = "#f5f5f5";
 const extraSpace = "&nbsp&nbsp";
 
-// Get the number of contests which is actually ordered/subdivided by GGO
+// Get the number of contests
 const listOfContests = [];
 function _initialize() {
     let count = 0;
-    for (const ggo of blankBallot.active_ggos) {
-        if (blankBallot.contests[ggo]) {
-            for (const contest of blankBallot.contests[ggo]) {
-                listOfContests[count] = contest;
-                count += 1;
-            }
-        }
+    for (const contest of blankBallot.contests) {
+        listOfContests[count] = contest;
+        count += 1;
     }
     return count;
 }
@@ -119,7 +115,7 @@ function setUpperSection(contestNum, thisContestName, thisContestValue, checkout
 <li>Though the ballot receipt is public, the row number is private.  Revealing your row number AND your ballot receipt will allow others to see how you voted.</li></ul>`;
         newItem.innerHTML = innerText;
     } else if (thisContestValue.tally == "plurality") {
-        const max = thisContestValue.max;
+        const max = thisContestValue.max_selections;
         // Setup plurality contest header info
         let innerText = "<h2>Contest " + (contestNum + 1) + ":&nbsp&nbsp&nbsp" + thisContestName + "</h2><h3>This is a plurality contest:</h3><ul><li>Make you selection by clicking.  Click again to unselect.</li>";
         if (max == 1) {
@@ -209,7 +205,7 @@ function setupChoiceList(thisContestName, thisContestValue, overrideChoice=null)
             // Note - need to add this as an additional flex-box
             // so that the 'name' matches the choice
             let addendum = [];
-            for (let office of thisContestValue.ticket_offices) {
+            for (let office of thisContestValue.ticket_titles) {
                 addendum.push(office + ":" + choice.ticket_names);
             }
             extraText.innerHTML = extraSpace;
@@ -369,7 +365,7 @@ function setupPluralityEventListeners(thisContestName, thisContestValue) {
         const itemText = listItem.textContent;
         const itemIndex = Array.from(choiceList.children).indexOf(listItem);
         if (listItem.classList.contains("unselected")) {
-            if (selectedCount < thisContestValue.max) {
+            if (selectedCount < thisContestValue.max_selections) {
                 // Select the item (up to maxSelection selections allowed)
                 listItem.classList.add("selected");
                 listItem.classList.remove("unselected");
@@ -424,7 +420,7 @@ function setupNavigationButtonListener(buttonString, thisContestNum, thisContest
             }
             thisContestValue["selection"] = selection;
             // and setting the progressBar color
-            let max = thisContestValue.max;
+            let max = thisContestValue.max_selections;
             if (!max) {
                 max = thisContestValue.choices.length;
             }
@@ -597,73 +593,66 @@ function setupCheckout() {
     setLowerSection("checkout", true);
     const rootElement = document.getElementById("choiceList");
     let index = 0;
-    for (const ggo of blankBallot.active_ggos) {
-        if (blankBallot.contests[ggo]) {
-            for (const contest of blankBallot.contests[ggo]) {
-                const newItem = document.createElement("li");
-                // just ake a table for now
-                newItem.classList.add("tableflexContainer");
-                // td's
-                const box1 = document.createElement("td");
-                box1.style.textAlign = "center";
-                const box2 = document.createElement("td");
-                box2.style.textAlign = "left";
-                const box3 = document.createElement("td");
-                box3.style.textAlign = "right";
-                const contestName = Object.keys(contest)[0];
-                const selections = Object.values(contest)[0].selection;
-                index += 1;
-                console.log("contest " + index + " (" + contestName + "), selection = " + selections);
-                box1.innerHTML = "Contest " + index + ":&nbsp&nbsp" + contestName;
-                let max = Object.values(contest)[0].max;
-                if (!max) {
-                    max = Object.values(contest)[0].choices.length;
-                }
-                if (!selections || selections.length == 0) {
-                    box2.innerHTML = "no selection - skipped";
-                    box2.classList.add("novotedText");
-                } else {
-                    box2.innerHTML = smartenSelections(selections, Object.values(contest)[0].tally).join("<br>");
-                    if (selections.length < max) {
-                        const extraText = document.createElement("span");
-                        extraText.innerHTML = "<br>undervoted - more votes are allowed";
-                        extraText.classList.add("undervotedText");
-                        box2.appendChild(extraText);
-                    }
-                }
-                // Create the goto button
-                const gotoButton = document.createElement("button");
-                gotoButton.innerText = "Edit Contest " + index;
-                gotoButton.id = "gotoContest" + index;
-                // add an event listener to the button
-                gotoButton.addEventListener("click", function (e) {
-                    console.log("Running gotoButton to contest " + index);
-                    // On a goto button click, clear out the children ...
-                    document.getElementById("upperSection").replaceChildren();
-                    document.getElementById("lowerSection").replaceChildren();
-                    document.getElementById("bottomSection").replaceChildren();
-                    // ... and goto the contest
-                    const buttonIdString = Number(this.id.match(/\d+$/)) - 1;
-                    setupNewContest(buttonIdString);
-                });
-                box3.appendChild(gotoButton);
-                // Create the table and add it
-                const table1 = document.createElement("table");
-                table1.classList.add("tableStyle");
-                const table2 = document.createElement("table");
-                table2.classList.add("tableStyle");
-                const row1 = document.createElement("tr");
-                const row2 = document.createElement("tr");
-                row1.appendChild(box1);
-                row2.appendChild(box2);
-                row2.appendChild(box3);
-                table1.appendChild(row1);
-                table2.appendChild(row2);
-                newItem.appendChild(table1);
-                newItem.appendChild(table2);
-                rootElement.appendChild(newItem);
+    for (const contest of blankBallot.contests) {
+        const newItem = document.createElement("li");
+        // just ake a table for now
+        newItem.classList.add("tableflexContainer");
+        // td's
+        const box1 = document.createElement("td");
+        box1.style.textAlign = "center";
+        const box2 = document.createElement("td");
+        box2.style.textAlign = "left";
+        const box3 = document.createElement("td");
+        box3.style.textAlign = "right";
+        const contestName = contest.contest_name;
+        const selections = contest.selection;
+        index += 1;
+        console.log("contest " + index + " (" + contestName + "), selection = " + selections);
+        box1.innerHTML = "Contest " + index + ":&nbsp&nbsp" + contestName;
+        let max = contest.max_selections;
+        if (!selections || selections.length == 0) {
+            box2.innerHTML = "no selection - skipped";
+            box2.classList.add("novotedText");
+        } else {
+            box2.innerHTML = smartenSelections(selections, Object.values(contest)[0].tally).join("<br>");
+            if (selections.length < max) {
+                const extraText = document.createElement("span");
+                extraText.innerHTML = "<br>undervoted - more votes are allowed";
+                extraText.classList.add("undervotedText");
+                box2.appendChild(extraText);
             }
         }
+        // Create the goto button
+        const gotoButton = document.createElement("button");
+        gotoButton.innerText = "Edit Contest " + index;
+        gotoButton.id = "gotoContest" + index;
+        // add an event listener to the button
+        gotoButton.addEventListener("click", function (e) {
+            console.log("Running gotoButton to contest " + index);
+            // On a goto button click, clear out the children ...
+            document.getElementById("upperSection").replaceChildren();
+            document.getElementById("lowerSection").replaceChildren();
+            document.getElementById("bottomSection").replaceChildren();
+            // ... and goto the contest
+            const buttonIdString = Number(this.id.match(/\d+$/)) - 1;
+            setupNewContest(buttonIdString);
+        });
+        box3.appendChild(gotoButton);
+        // Create the table and add it
+        const table1 = document.createElement("table");
+        table1.classList.add("tableStyle");
+        const table2 = document.createElement("table");
+        table2.classList.add("tableStyle");
+        const row1 = document.createElement("tr");
+        const row2 = document.createElement("tr");
+        row1.appendChild(box1);
+        row2.appendChild(box2);
+        row2.appendChild(box3);
+        table1.appendChild(row1);
+        table2.appendChild(row2);
+        newItem.appendChild(table1);
+        newItem.appendChild(table2);
+        rootElement.appendChild(newItem);
     }
 
     // 3) For the demo, create two buttons for now: spoil and vote.
@@ -697,8 +686,8 @@ function setupCheckout() {
 // is called.  Just being clear about that.
 function setupNewContest(thisContestNum) {
     console.log("Running setupNewContest: contest " + thisContestNum);
-    let thisContestName = Object.keys(listOfContests[thisContestNum])[0];
-    let thisContestValue = Object.values(listOfContests[thisContestNum])[0];
+    let thisContestValue = listOfContests[thisContestNum];
+    let thisContestName = thisContestValue["contest_name"];
 
     // and initialize them
     setProgressBarColor(thisContestNum, "activeContest");

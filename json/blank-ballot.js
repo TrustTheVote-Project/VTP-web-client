@@ -3,125 +3,143 @@ const blankBallotJSON = `{
         ".",
         "GGOs/states/Massachusetts",
         "GGOs/states/Massachusetts/GGOs/counties/Middlesex",
-        "GGOs/states/Massachusetts/GGOs/towns/Concord"
+        "GGOs/states/Massachusetts/GGOs/towns/Concord",
+        "GGOs/states/Massachusetts/GGOs/towns/Concord/GGOs/precincts/1"
     ],
-    "ballot_filename": "000,001,002,003,ballot.json",
+    "ballot_filename": "000,001,002,003,004,ballot.json",
     "ballot_node": "GGOs/states/Massachusetts/GGOs/towns/Concord",
     "ballot_subdir": "GGOs/states/Massachusetts/GGOs/towns/Concord",
-    "contests": {
-        "GGOs/states/Massachusetts": [
-            {
-                "U.S. President": {
-                    "choices": [
-                        {
-                            "name": "Circle Party Ticket",
-                            "ticket_names": [
-                                "Rey Skywalker",
-                                "Obi-Wan Kenobi"
-                            ]
-                        },
-                        {
-                            "name": "Square Party Ticket",
-                            "ticket_names": [
-                                "Atticus Finch",
-                                "Hermione Granger"
-                            ]
-                        },
-                        {
-                            "name": "Triangle Party Ticket",
-                            "ticket_names": [
-                                "Evelyn Quan Wang",
-                                "Waymond Wang"
-                            ]
-                        }
-                    ],
-                    "contest_type": "ticket",
-                    "max": 1,
-                    "tally": "plurality",
-                    "ticket_offices": [
-                        "President",
-                        "Vice President"
-                    ],
-                    "uid": "0000"
+    "contests": [
+        {
+            "choices": [
+                {
+                    "name": "Circle Party Ticket",
+                    "ticket_names": [
+                        "Rey Skywalker",
+                        "Obi-Wan Kenobi"
+                    ]
+                },
+                {
+                    "name": "Square Party Ticket",
+                    "ticket_names": [
+                        "Atticus Finch",
+                        "Hermione Granger"
+                    ]
+                },
+                {
+                    "name": "Triangle Party Ticket",
+                    "ticket_names": [
+                        "Evelyn Quan Wang",
+                        "Waymond Wang"
+                    ]
                 }
-            },
-            {
-                "U.S. Senate": {
-                    "choices": [
-                        {
-                            "name": "Anthony Alpha",
-                            "party": "Circle Party"
-                        },
-                        {
-                            "name": "Betty Beta",
-                            "party": "Dyad Party"
-                        },
-                        {
-                            "name": "Gloria Gamma",
-                            "party": "Triangle Party"
-                        },
-                        {
-                            "name": "David Delta",
-                            "party": "Square Party"
-                        },
-                        {
-                            "name": "Emily Echo",
-                            "party": "Pentagon Party"
-                        },
-                        {
-                            "name": "Francis Foxtrot",
-                            "party": "Hexagon Party"
-                        }
-                    ],
-                    "tally": "rcv",
-                    "uid": "0001"
+            ],
+            "contest_name": "U.S. President",
+            "contest_type": "ticket",
+            "election_upstream_remote": "https://github.com/TrustTheVote-Project/VTP-mock-election.US.16",
+            "ggo": "GGOs/states/Massachusetts",
+            "max_selections": 1,
+            "tally": "plurality",
+            "ticket_titles": [
+                "President",
+                "Vice President"
+            ],
+            "uid": "0000",
+            "win_by": "0.5"
+        },
+        {
+            "choices": [
+                {
+                    "name": "Anthony Alpha",
+                    "party": "Circle Party"
+                },
+                {
+                    "name": "Betty Beta",
+                    "party": "Dyad Party"
+                },
+                {
+                    "name": "Gloria Gamma",
+                    "party": "Triangle Party"
+                },
+                {
+                    "name": "David Delta",
+                    "party": "Square Party"
+                },
+                {
+                    "name": "Emily Echo",
+                    "party": "Pentagon Party"
+                },
+                {
+                    "name": "Francis Foxtrot",
+                    "party": "Hexagon Party"
                 }
-            },
-            {
-                "Governor": {
-                    "choices": [
-                        {
-                            "name": "Spencer Cogswell",
-                            "party": "Circle Party"
-                        },
-                        {
-                            "name": "Cosmo Spacely",
-                            "party": "Triangle Party"
-                        }
-                    ],
-                    "max": 1,
-                    "tally": "plurality",
-                    "uid": "0002"
+            ],
+            "contest_name": "U.S. Senate",
+            "contest_type": "candidate",
+            "election_upstream_remote": "https://github.com/TrustTheVote-Project/VTP-mock-election.US.16",
+            "ggo": "GGOs/states/Massachusetts",
+            "max_selections": 6,
+            "tally": "rcv",
+            "uid": "0001",
+            "win_by": "0.5"
+        },
+        {
+            "choices": [
+                {
+                    "name": "Jean-Luc Picard"
+                },
+                {
+                    "name": "Katniss Everdeen"
+                },
+                {
+                    "name": "James T. Kirk"
                 }
-            }
-        ],
-        "GGOs/states/Massachusetts/GGOs/counties/Middlesex": [
-            {
-                "County Clerk": {
-                    "choices": [
-                        "Jean-Luc Picard",
-                        "Katniss Everdeen",
-                        "James T. Kirk"
-                    ],
-                    "max": 1,
-                    "tally": "plurality",
-                    "uid": "0003"
+            ],
+            "contest_name": "County Clerk",
+            "contest_type": "candidate",
+            "election_upstream_remote": "https://github.com/TrustTheVote-Project/VTP-mock-election.US.16",
+            "ggo": "GGOs/states/Massachusetts/GGOs/counties/Middlesex",
+            "max_selections": 1,
+            "tally": "plurality",
+            "uid": "0002",
+            "win_by": "0.5"
+        },
+        {
+            "choices": [
+                {
+                    "name": "Rebecca Welton"
+                },
+                {
+                    "name": "Keeley Jones"
                 }
-            }
-        ],
-        "GGOs/states/Massachusetts/GGOs/towns/Concord": [
-            {
-                "Question 1 - should the starting time of the annual town meeting be moved to 6:30 PM?": {
-                    "choices": [
-                        "yes",
-                        "no"
-                    ],
-                    "description": "Should the Town of Concord start the annual Town Meeting at 6:30 PM instead of 7:00 PM?",
-                    "max": 1,
-                    "tally": "plurality",
-                    "uid": "0004"
+            ],
+            "contest_name": "Athletic Director",
+            "contest_type": "candidate",
+            "election_upstream_remote": "https://github.com/TrustTheVote-Project/VTP-mock-election.US.16",
+            "ggo": "GGOs/states/Massachusetts/GGOs/towns/Concord/GGOs/precincts/1",
+            "max_selections": 1,
+            "tally": "plurality",
+            "uid": "0004",
+            "win_by": "0.5"
+        },
+        {
+            "choices": [
+                {
+                    "name": "yes"
+                },
+                {
+                    "name": "no"
                 }
-            }
-        ]
-    }
+            ],
+            "contest_name": "Question 1 - should the starting time of the annual town meeting be moved to 6:30 PM?",
+            "contest_type": "question",
+            "description": "Should the Town of Concord start the annual Town Meeting at 6:30 PM instead of 7:00 PM?",
+            "election_upstream_remote": "https://github.com/TrustTheVote-Project/VTP-mock-election.US.16",
+            "ggo": "GGOs/states/Massachusetts/GGOs/towns/Concord",
+            "max_selections": 1,
+            "tally": "plurality",
+            "uid": "0003",
+            "win_by": "2/3"
+        }
+    ]
 }`;

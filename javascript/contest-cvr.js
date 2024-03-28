@@ -13,7 +13,7 @@ try {
 function displayLog(contestCVR, digestURL) {
     const rootElement = document.getElementById("lowerSection");
     let jsonString = JSON.stringify(contestCVR, undefined, 2);
-    rootElement.appendChild(document.createElement('pre')).innerHTML = syntaxHighlight(jsonString, digestURL, contestCVR.log.CVR.uid);
+    rootElement.appendChild(document.createElement('pre')).innerHTML = syntaxHighlight(jsonString, digestURL, contestCVR.Log.contestCVR.uid);
 }
 
 // Adds an explicit tally button

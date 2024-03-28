@@ -4,7 +4,7 @@
 // Create the ballotCheck javascript object from the blankBallotJSON JSON object literal
 var outerJSON = null;
 try {
-    outerJSON = JSON.parse(ballotReceiptJSON);
+    outerJSON = JSON.parse(receiptJSON);
 } catch (e) {
     console.error(e);
 }
@@ -34,9 +34,9 @@ function createReceiptTable(ballotCheck) {
             for (let colIndex = 0; colIndex <  numberOfColumns; colIndex++) {
                 let headerText = "";
                 if (colIndex == 0) {
-                    headerText = `<th>${ballotCheck[0][0]}</th>`;
+                    headerText = `<th>row index</th>`;
                 } else {
-                    headerText = `<th><a  href="tally-election.html?contest=${ballotCheck[0][colIndex].split('<br>', 2)[0]}" target="_blank">${ballotCheck[0][colIndex].split('<br>', 2)[1]}</a></th>`;
+                    headerText = `<th><a  href="tally-election.html?contest=${ballotCheck[0][colIndex].split(' - ', 2)[0]}" target="_blank">${ballotCheck[0][colIndex].split(' - ', 2)[1]}</a></th>`;
                 }
                 innerText += headerText;
             }
@@ -78,10 +78,10 @@ function setRowNumber(ballotRow) {
 }
 
 // Set row number
-setRowNumber(outerJSON["ballotRow"]);
+setRowNumber(outerJSON["ballot_row"]);
 
 // create the table
-createReceiptTable(outerJSON["ballotCheck"]);
+createReceiptTable(outerJSON["ballot_check"]);
 
 // Erase row number
 window.addEventListener("load", function() {
@@ -89,5 +89,5 @@ window.addEventListener("load", function() {
     eraseRowNumber();
     setTimeout(() => {
         setRowNumber(null);
-    }, 5000);
+    }, 4000);
 }, false);

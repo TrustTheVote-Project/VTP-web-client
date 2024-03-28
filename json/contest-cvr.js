@@ -1,10 +1,10 @@
 const contestCVRJSON = `{
-    "commit": "4a99ccefbd96e51d7cc2730d9b107df1512d7b84",
-    "Author": "Sandy Currier <windoverwater@users.noreply.github.com>",
-    "Date": "Sat Jan 1 12:00:00 2022 -0500",
-    "log": {
-        "CVR": {
-            "cast_branch": "CVRs/0001/30c18a9b6f",
+"commit": "89fef35513fc0b51e292056150d46a82004598dc (origin/CVRs/0001/1710de1767)",
+"Author": "Sandy Currier <windoverwater@users.noreply.github.com>",
+"Date": "Tue Nov 5 12:00:00 2024 -0500",
+"Log": {
+        "contestCVR": {
+            "cast_branch": "CVRs/0001/1710de1767",
             "choices": [
                 {
                     "name": "Anthony Alpha",
@@ -31,17 +31,22 @@ const contestCVRJSON = `{
                     "party": "Hexagon Party"
                 }
             ],
+            "contest_name": "U.S. Senate",
+            "contest_type": "candidate",
+            "election_upstream_remote": "https://github.com/TrustTheVote-Project/VTP-mock-election.US.16",
             "ggo": "GGOs/states/Massachusetts",
-            "name": "U.S. Senate",
+            "max_selections": 6,
             "selection": [
-                "5: Francis Foxtrot",
                 "4: Emily Echo",
+                "5: Francis Foxtrot",
+                "0: Anthony Alpha",
                 "3: David Delta",
                 "2: Gloria Gamma",
                 "1: Betty Beta"
             ],
             "tally": "rcv",
-            "uid": "0001"
+            "uid": "0001",
+            "win_by": "0.5"
         }
     }
 }`;
