@@ -1,0 +1,28 @@
+.receiptTable {
+    border-collapse: collapse;
+    border-spacing: 1px;
+    outline: 1px black;
+}
+
+.receiptTD, .receiptTH {
+}
+
+td:hover {
+    border: -2px inset black;
+    outline: 2px outset black;
+    position: relative;
+    z-index:1;
+    padding:1px;
+}
+
+/* From: https://fvsch.com/articles/transition-fade/test5.html */
+.visible {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 5s linear;
+}
+.hidden {
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s 5s, opacity 5s linear;
+}

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="stylesheets/stdout.css">
+        <script defer src="json/tally-output.js"></script>
+        <script defer src="javascript/common.js"></script>
+        <script defer src="javascript/tally-contest.js"></script>
+        <title>Tally a contest - User Story 6</title>
+        <style>
+        /* box debugging
+         * {
+	   border-style: solid;
+	   border-color: red;
+           }
+         */
+        </style>
+    </head>
+    <body>
+        <!-- The upper span start here.
+             Nominally this is where help text is placed
+        -->
+        <h2>This page verifies a ballot Cast Vote Record (CVR)</h2>
+        <ul>
+            <li>Clicking a digest will directly inspect that contest CVR</li>
+        </ul>
+        <div id="upperSection"></div>
+        <!-- The lower span start here.
+             This is where the CVR is displayed
+        -->
+        <div id="lowerSection"></div>
+
+        <!-- The bottom span start here.
+             Any bottom buttons can be placed here - for UX
+             perhaps a tally button
+        -->
+        <div id="bottomSection"></div>
+    </body>
+</html>
