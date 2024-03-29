@@ -34,22 +34,24 @@ function syntaxHighlightJSON(jsonString, digestURL=null, contestNumber=null) {
 }
 
 // Color STDOUT log strings, which is passed as an array of strings (one per line)
-function syntaxHighlightVerify(jsonArray, digestURL=null, tallyURL=null) {
+function syntaxHighlightStdout(jsonArray, digestURL=null, tallyURL=null) {
     // Handle digest links
     let newOutput = []
     for (let line of jsonArray) {
         let newLine = line;
         let digest = false;
+        // Convert digests to hrefs
         newLine = newLine.replace(/\b([a-fA-F0-9]{40})\b/, function (match) {
             digest = match;
             return `<a target="_blank" href=${digestURL}?digest=${digest}>${digest}</a>`;
         });
+        // Convert contest uids to hrefs
         if (digest) {
             newLine = newLine.replace(/\b([0-9]{4}\b)/, function (match) {
                 return `<a target="_blank" href=${tallyURL}?contest=${match}&digests=${digest}>${match}</a>`;
             });
         }
-        // also handle GOOD and BAD boxes
+        // Handle GOOD and BAD lines
         if (line.match(/^\[GOOD\]/) || line == "*".repeat(12)) {
             newLine = `<span class=good>${newLine}</span>`;
         }
@@ -59,6 +61,15 @@ function syntaxHighlightVerify(jsonArray, digestURL=null, tallyURL=null) {
         if (line.match(/^\[WARNING\]/) || line == "=".repeat(12)) {
             newLine = `<span class=warning>${newLine}</span>`;
         }
+        // Handle text based horizontal lines
+        newLine = newLine.replace(/^(-)+/, function (match) {
+            return `<span class=warning>${newLine}</span>`;
+        });
+        // Handle leading spaces
+        newLine = newLine.replace(/^( )+/, function (match) {
+            return `${"&nbsp;".repeat(match.length)}`;
+        });
+        // Save
         newOutput.push(newLine);
     };
     return newOutput.join("<br>");

@@ -1,10 +1,10 @@
-// Used exclusively for User Story #5 - verify-ballot.html
+// Used exclusively for User Story #6 - tally-contest.html
 
 // Need the JSON data for just about everything
 // Create the ballotCheck javascript object from the blankBallotJSON JSON object literal
 var outerJSON = null;
 try {
-    outerJSON = JSON.parse(verifyOutputJSON);
+    outerJSON = JSON.parse(tallyOutputJSON);
 } catch (e) {
     console.error(e);
 }
