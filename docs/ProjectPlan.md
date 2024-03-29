@@ -38,8 +38,8 @@ The four major milestones are:
 
 To achieve the demo all four of the above major milestones need to be completed by end of may.  Project completion means that the live demo is running without significant issues on a standalong router disconnected from any WAN.  Thus:
 
-- Completion of milestone 1: 02/21 (1 week)
-- Completion of milestone 2: 03/21 (4 weeks)
+- Completion of milestone 1: 02/21 (1 week); completed 2/21
+- Completion of milestone 2: 03/21 (4 weeks); completed 2/29
 - Completion of milestone 3: 04/17 (4 weeks)
 - Completion of milestone 4: 05/01 (2 weeks)
 
@@ -79,11 +79,10 @@ Given the decomposition into [6 user stories](./DesingNotes.md), out-of-the-gate
  - basically html wraps console output
  - each digest number is a link to its contest-cvr.html page
  - the 'vote NNN' is a link to the tally-contest.html page for this specific contest
- - status:
+ - status: milestone 2 ✅
 
 6. tally-election.html
  - handles the output of tallying a contest
  - basically wraps console output
- - support buttons to re-run the tally with different levels of verbosity (perhaps one button for each)
- - status:
- 
+ - support buttons to re-run the tally with different levels of verbosity; TBD in milestone 4
+ - status: milestone 2 ✅
