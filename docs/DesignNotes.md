@@ -72,3 +72,28 @@ TBD - see ProjectPlan.md - verify-ballot-check.html
 #### What happens when the user wants to tally the election?
 
 TBD - see ProjectPlan.md - tally-election.html
+
+## General client <-> web-api <-> backend spring demo #2 data flow
+
+1. user lands on welcome page: http://127.0.0.1/index.html 
+ - served as a static uvicorn page
+ - clicks a button which:
+   - optionally passes the address as a parameter
+   - goes to http://127.0.0.1/voting.html (in the existing tab)
+2. user lands on http://127.0.0.1/voting.html
+ - served as a static uvicorn page
+ - reads an optional address parameter
+ - will fetch a (possibly address specific) blank ballot via http://127.0.0.1/get\_blank_ballot endpoint
+   - this endpoint is altered so to not require a vote\_store_id GUID (note - the GUID workspace is not created until the ballot is cast)
+ - completely handles the voting process by changing the DOM, not by loading/reloading a new page
+ - if voter spoils ballot, voter returns to index.html (in same tab)
+ - if casts ballot, calls the http://127.0.0.1/cast-ballot endpoint supplying cast_ballot json
+   - this (existing) endpoint is altered so that it:
+     - creates the vote\_store_id GUID first
+     - then calls the backend to cast the ballot
+     - if successful returns the GUID and the receipt
+ - note - the existing http://127.0.0.1/receipt.html page is deleted and the javascript moved to the voting.js page so that voting.js also handles displaying the receipt by re-writing the DOM
+3. while viewing the receipt contest, user can click to create new tabs for contest-cvr, verify, and tally
+4. contest-cvr - http://127.0.0.1/contest-cvr.index?GUID (with endpoints having the GUID embedded in the path)
+5. verify-ballot - http://127.0.0.1/verify-ballot.html?GUID
+6. tally-contest - http://127.0.0.1/tally-contest.html?GUID
