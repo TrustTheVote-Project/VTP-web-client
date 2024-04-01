@@ -499,13 +499,7 @@ function setupVoteButtonListener(buttonString, rootElement) {
     newButton.addEventListener("click", function (e) {
         console.log("Running '" + buttonString + "' eventListener");
         if (buttonString == "VOTE") {
-            // Send the blankBallot object to the web-api endpoint.
-            // ZZZ
-            // For now, just print it to the page
-            let jsonString = JSON.stringify(blankBallot, undefined, 2);
-            rootElement.appendChild(document.createElement('pre')).innerHTML = syntaxHighlightJSON(jsonString);
-            // ZZZ for the demo, destroy the blankBallot as well
-            nullifySession();
+            setupReceiptPage();
         } else if (buttonString == "Spoil Ballot") {
             // For now, just print something, destroy the blankBallot,
             // and go to home page
@@ -666,7 +660,7 @@ function setupCheckout() {
     //      casts it, returning the ballot receipt and row number
     const spoilButton = setupVoteButtonListener("Spoil Ballot", rootElement);
     const voteButton = setupVoteButtonListener("VOTE", rootElement);
-    // Create the table and add it
+    // Create the table and add them
     const voteTable = document.createElement("table");
     voteTable.classList.add("tableStyle");
     const row1 = document.createElement("tr");
@@ -748,6 +742,55 @@ function setupNewContest(thisContestNum) {
     setupProgressBarNavigation(thisContestNum, thisContestValue);
 }
 
+// Voting is completed - show the receipt
+function setupReceiptPage() {
+    // Send the blankBallot object to the web-api endpoint.
+    // ZZZ TBD
+
+    // For now log it
+    console.log(blankBallot);
+    // ZZZ for the demo, destroy the blankBallot as well
+    nullifySession();
+
+    // Clear out progressBar and progressBar stylesheet - remove everything
+    const progressBar = document.getElementById("progressBar");
+    progressBar.parentNode.removeChild(progressBar);
+
+    // Clear out youAreHereBar
+    document.getElementById("youAreHereBar").replaceChildren();
+
+    // Clear all all three sections
+    const upperSection = document.getElementById("upperSection");
+    const lowerSection = document.getElementById("lowerSection");
+    upperSection.replaceChildren();
+    lowerSection.replaceChildren();
+    document.getElementById("bottomSection").replaceChildren();
+
+    // Add upper text
+    const upperSpan = document.createElement("span");
+    upperSpan.innerHTML = `<h2>This is a ballot check</h2>
+<ul>
+<li>Clicking a contest digest will display that contest</li>
+<li>Clicking the row index will validate that row of contests</li>
+<li>Clicking the column header will tally that contest</li>
+</ul>
+<table><tr><th>
+<h2>Your row number is: <span id="tofade" class="visible"><span id="rowNum">null</span></span></h2></th><th>&nbsp&nbsp(disappears in 5 seconds)</th></tr></table>`;
+    upperSection.appendChild(upperSpan);
+
+    // Create the table (this creates the receipt DOM)
+    createReceiptTable();
+
+    // Set the row number
+    setRowNumber();
+
+    // Fade the row number
+    fadeOut();
+}
+
+// ################
+// __main__
+// ################
 // If here, this is the first contest
 // set up the bars once
 setupProgressBars(numberOfContests);

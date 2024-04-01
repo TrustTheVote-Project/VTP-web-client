@@ -39,7 +39,7 @@ The four major milestones are:
 To achieve the demo all four of the above major milestones need to be completed by end of may.  Project completion means that the live demo is running without significant issues on a standalong router disconnected from any WAN.  Thus:
 
 - Completion of milestone 1: 02/21 (1 week); completed 2/21
-- Completion of milestone 2: 03/21 (4 weeks); completed 2/29
+- Completion of milestone 2: 03/21 (4 weeks); completed 3/29
 - Completion of milestone 3: 04/17 (4 weeks)
 - Completion of milestone 4: 05/01 (2 weeks)
 

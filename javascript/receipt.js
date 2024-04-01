@@ -1,24 +1,24 @@
 // Used exclusively for User Story #3 - receipt.html
 
 // Need the JSON data for just about everything
-// Create the ballotCheck javascript object from the blankBallotJSON JSON object literal
-var outerJSON = null;
+// Create the receiptObject javascript object from the blankBallotJSON JSON object literal
+var receiptObject = null;
 try {
-    outerJSON = JSON.parse(receiptJSON);
+    receiptObject = JSON.parse(receiptJSON);
 } catch (e) {
     console.error(e);
 }
 
-// Place the ballotCheck in upperSection with the inserted links.
+// Place the receiptObject in upperSection with the inserted links.
 // At the moment there are no buttons, just the three types of links:
 // - digests point to the contest-cvr.html page
 // - row headers point to the verify-ballot-check.html page
 // - column headers point to the tally-election.html page
-function createReceiptTable(ballotCheck) {
-    const numberOfRows = ballotCheck.length;
-    const numberOfColumns = ballotCheck[0].length;
+function createReceiptTable() {
+    const numberOfRows = receiptObject["ballot_check"].length;
+    const numberOfColumns = receiptObject["ballot_check"][0].length;
     if (numberOfColumns < 2 || numberOfRows < 2) {
-        throw new Error("javascript error: the ballotCheck array is effectively empty");
+        throw new Error("javascript error: the receiptObject array is effectively empty");
     }
     const rootElement = document.getElementById("lowerSection");
     const table = document.createElement("table");
@@ -36,7 +36,7 @@ function createReceiptTable(ballotCheck) {
                 if (colIndex == 0) {
                     headerText = `<th>row index</th>`;
                 } else {
-                    headerText = `<th><a  href="tally-election.html?contest=${ballotCheck[0][colIndex].split(' - ', 2)[0]}" target="_blank">${ballotCheck[0][colIndex].split(' - ', 2)[1]}</a></th>`;
+                    headerText = `<th><a  href="tally-election.html?contest=${receiptObject["ballot_check"][0][colIndex].split(' - ', 2)[0]}" target="_blank">${receiptObject["ballot_check"][0][colIndex].split(' - ', 2)[1]}</a></th>`;
                 }
                 innerText += headerText;
             }
@@ -55,7 +55,7 @@ function createReceiptTable(ballotCheck) {
         // The other columns are digest links
         let digests = [];
         for (let colIndex = 1; colIndex <  numberOfColumns; colIndex++) {
-            const digest = ballotCheck[index][colIndex];
+            const digest = receiptObject["ballot_check"][index][colIndex];
             digests.push(digest);
             innerText += `<td><a target="_blank" class="receiptTD" href="contest-cvr.html?digest=${digest}">${digest}</a></td>`;
         }
@@ -66,28 +66,26 @@ function createReceiptTable(ballotCheck) {
     rootElement.appendChild(table);
 }
 
-function eraseRowNumber() {
-    const rootElement = document.getElementById("hide");
-    rootElement.classList.remove("visible");
-    rootElement.classList.add("hidden");
-    outerJSON["ballotRow"] = null
+function setRowNumber() {
+    document.getElementById("rowNum").innerText = receiptObject["ballot_row"];
 }
 
-function setRowNumber(ballotRow) {
-    document.getElementById("rowNum").innerText = ballotRow;
+// Create a function to fade out the element
+function fadeOut() {
+    const fade = document.getElementById("rowNum");
+    let opacity = 1.0;
+    const intervalID = setInterval(function() {
+        if (opacity > 0) {
+            opacity = opacity - 0.05
+            fade.style.opacity = opacity;
+            console.log("setInterval fade");
+        } else {
+            // wipe out the row data
+            fade.style.display = 'none';
+            fade.innerText = "";
+            receiptObject["ballot_row"] = null;
+            clearInterval(intervalID);
+            console.log("setInterval cleared");
+        }
+    }, 200);
 }
-
-// Set row number
-setRowNumber(outerJSON["ballot_row"]);
-
-// create the table
-createReceiptTable(outerJSON["ballot_check"]);
-
-// Erase row number
-window.addEventListener("load", function() {
-    // loaded
-    eraseRowNumber();
-    setTimeout(() => {
-        setRowNumber(null);
-    }, 4000);
-}, false);

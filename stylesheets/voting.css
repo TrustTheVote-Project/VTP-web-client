@@ -106,3 +106,21 @@ pre {outline: 1px solid #ccc; padding: 5px; margin: 5px; }
 .JSONboolean { color: blue; }
 .JSONnull { color: magenta; }
 .JSONkey { color: red; }
+
+/* receipt table specific */
+.receiptTable {
+    border-collapse: collapse;
+    border-spacing: 1px;
+    outline: 1px black;
+}
+
+.receiptTD, .receiptTH {
+}
+
+.receiptTD:hover {
+    border: -2px inset black;
+    outline: 2px outset black;
+    position: relative;
+    z-index:1;
+    padding:1px;
+}
