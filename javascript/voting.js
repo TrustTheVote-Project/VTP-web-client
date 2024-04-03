@@ -754,7 +754,8 @@ function setupReceiptPage() {
 
     // Clear out progressBar and progressBar stylesheet - remove everything
     const progressBar = document.getElementById("progressBar");
-    progressBar.parentNode.removeChild(progressBar);
+    progressBar.replaceChildren();
+    progressBar.style.backgroundColor = "transparent";
 
     // Clear out youAreHereBar
     document.getElementById("youAreHereBar").replaceChildren();
@@ -775,7 +776,7 @@ function setupReceiptPage() {
 <li>Clicking the column header will tally that contest</li>
 </ul>
 <table><tr><th>
-<h2>Your row number is: <span id="tofade" class="visible"><span id="rowNum">null</span></span></h2></th><th>&nbsp&nbsp(disappears in 5 seconds)</th></tr></table>`;
+<h2>Your row number is: <span id="tofade" class="visible"><span id="rowIndex">null</span></span></h2></th><th>&nbsp&nbsp(disappears in 5 seconds)</th></tr></table>`;
     upperSection.appendChild(upperSpan);
 
     // Create the table (this creates the receipt DOM)

@@ -55,33 +55,25 @@ Given the decomposition into [6 user stories](./DesingNotes.md), out-of-the-gate
  - status: milestone 2 ✅
 
 2. voting.html
- - handles voting a complete ballot
+ - handles voting a complete ballot including displaying the ballot receipt
  - provides navigation to previous, next, other contests (same page)
  - provides progress status
  - includes a checkout function which submits the cast ballot to the backend
  - status: milestone 2 ✅
 
-3. receipt.html
- - displays the ballot receipt/check
- - for demo purposes, also momentarily displays the row number
- - each digest is a link to the contest-cvr.html page
- - each row index is a link to the ballot-validation.html page
- - each column header is a link to the tally-contest.html page for that contest
- - status: milestone 2 ✅
-
-4. context-cvr.html
+3. context-cvr.html
  - basically displays the git log for the contest CVR commit.  No code diff - just the git log.
  - has a button to tally the context while tracking this specific contest CVR
  - status: milestone 2 ✅
 
-5. verify-ballot-check.html
+4. verify-ballot-check.html
  - will show the digests for each of the contests with the associated contest vote count NNN
  - basically html wraps console output
  - each digest number is a link to its contest-cvr.html page
  - the 'vote NNN' is a link to the tally-contest.html page for this specific contest
  - status: milestone 2 ✅
 
-6. tally-election.html
+5. tally-election.html
  - handles the output of tallying a contest
  - basically wraps console output
  - support buttons to re-run the tally with different levels of verbosity; TBD in milestone 4

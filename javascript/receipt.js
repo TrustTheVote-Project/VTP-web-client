@@ -67,12 +67,12 @@ function createReceiptTable() {
 }
 
 function setRowNumber() {
-    document.getElementById("rowNum").innerText = receiptObject["ballot_row"];
+    document.getElementById("rowIndex").innerText = receiptObject["ballot_row"];
 }
 
 // Create a function to fade out the element
 function fadeOut() {
-    const fade = document.getElementById("rowNum");
+    const fade = document.getElementById("rowIndex");
     let opacity = 1.0;
     const intervalID = setInterval(function() {
         if (opacity > 0) {
