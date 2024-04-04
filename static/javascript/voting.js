@@ -1,43 +1,23 @@
 // Used exclusively for User Story #2 - voting.html
 
-// Need the JSON data for just about everything
-// Create the blankBallot javascript object from the blankBallotJSON JSON object literal
-var blankBallot = null;
-if (MOCK) {
-    try {
-        blankBallot = JSON.parse(blankBallotJSON);
-    } catch (e) {
-        console.error(e);
-    }
-} else {
-    blankBallot = fetchData(getBlankBallotURL);
-}
-
 // Note - for the moment let these be globals (until we know more).
 // Regardless, the upper/lower setup will make sure choiceList and
 // sortableList are already defined.
 var choiceList = null;
 var sortableList = null;
 var removeButtons = null;
-// Don't know how to implement a closure or equivilent yet
+// Don't know how to implement a closure or equivilent yet - this is a global
+// to store how many choices have been so far selected in a RCV contest.
 var selectedCount = 0;
+var listOfContests = [];
+var numberOfContests = 0;
+// A global to store the actual incoming blank ballot
+var blankBallot = null;
 
-// Odds and ends
+// Various constants
 const selectBackgroundColor = "#f5f5f5";
 const extraSpace = "&nbsp&nbsp";
-
-// Get the number of contests
-const listOfContests = [];
-function _initialize() {
-    let count = 0;
-    for (const contest of blankBallot.contests) {
-        listOfContests[count] = contest;
-        count += 1;
-    }
-    return count;
-}
-const numberOfContests = _initialize();
-console.log("there are " + numberOfContests + " contest(s)");
+const getBlankBallotURL =  "http://127.0.0.1:8000/web-api/get_blank_ballot";
 
 // Define a YouAreThere inline glyph
 const yrhIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -796,8 +776,44 @@ function setupReceiptPage() {
 // ################
 // __main__
 // ################
-// If here, this is the first contest
-// set up the bars once
-setupProgressBars(numberOfContests);
-// set up the first contest
-setupNewContest(0);
+function main(incomingBB) {
+    // Get the number of contests
+    blankBallot = incomingBB;
+    listOfContests = incomingBB.contests;
+    numberOfContests = incomingBB.contests.length;
+    console.log("there are " + numberOfContests + " contest(s)");
+    // When we are here, we are about to set up the first contest.
+    // set up the bars once
+    setupProgressBars(numberOfContests);
+    // set up the first contest
+    setupNewContest(0);
+}
+
+// Need the JSON data for just about everything.  However, the way to get
+// external json is with a fetch, which is asynchronous.  Which means that
+// just about everything on this page needs to run within the callback to
+// the async function (called only when !MOCK_WEBAPI).
+function asyncFetchData(url) {
+    // RETURN the promise
+    return fetch(url).then(function(response){
+        return response.json(); // Process it inside the `then`
+    });
+}
+
+// To mock or not to mock
+if (MOCK_WEBAPI) {
+    try {
+        console.log("parsing mock blank ballot");
+        const incoming = JSON.parse(blankBallotJSON);
+    } catch (e) {
+        console.error(e);
+    }
+    main(incoming);
+} else {
+    console.log("fetching a live blank ballot");
+    asyncFetchData(getBlankBallotURL).then(function(response){
+        // Access the value inside the `then`
+        console.log("retrieved the live blank ballot");
+        main(response.blank_ballot);
+    })
+}
