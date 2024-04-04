@@ -1,3 +1,51 @@
+// Some global constants
+const getBlankBallotURL = "http://127.0.0.1:8000/web-api/get_blank_ballot";
+const MOCK = false;
+
+// fetch data from the web-api with a GET
+async function fetchData(url) {
+    try {
+        console.log('Fetching from ' + url);
+        const response = await fetch(url, {
+            method: "GET",
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+        console.log('Waiting on response from ' + url);
+        if (!response.ok) {
+            throw new Error(`Network response was not ok: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log('Fetched data:', data);
+        return data
+    } catch (error) {
+        console.error("Error fetching data from " + url + ":", error);
+    }
+}
+
+// post-fetch data to-from the web-api with a POST
+async function postData(url, data) {
+    try {
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(data),
+        });
+        if (!response.ok) {
+            throw new Error(`Network response was not ok: ${response.status}`);
+        }
+        const responseData = await response.json();
+        console.log(responseData);
+        return responseData;
+    } catch (error) {
+        console.error("Error posting data:", error);
+    }
+}
+
 // Color JSON strings
 function syntaxHighlightJSON(jsonString, digestURL=null, contestNumber=null) {
     let newString = jsonString.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');

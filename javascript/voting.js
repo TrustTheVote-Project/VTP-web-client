@@ -3,10 +3,14 @@
 // Need the JSON data for just about everything
 // Create the blankBallot javascript object from the blankBallotJSON JSON object literal
 var blankBallot = null;
-try {
-    blankBallot = JSON.parse(blankBallotJSON);
-} catch (e) {
-    console.error(e);
+if (MOCK) {
+    try {
+        blankBallot = JSON.parse(blankBallotJSON);
+    } catch (e) {
+        console.error(e);
+    }
+} else {
+    blankBallot = fetchData(getBlankBallotURL);
 }
 
 // Note - for the moment let these be globals (until we know more).
