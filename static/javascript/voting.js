@@ -789,17 +789,6 @@ function main(incomingBB) {
     setupNewContest(0);
 }
 
-// Need the JSON data for just about everything.  However, the way to get
-// external json is with a fetch, which is asynchronous.  Which means that
-// just about everything on this page needs to run within the callback to
-// the async function (called only when !MOCK_WEBAPI).
-function asyncFetchData(url) {
-    // RETURN the promise
-    return fetch(url).then(function(response){
-        return response.json(); // Process it inside the `then`
-    });
-}
-
 // To mock or not to mock
 if (MOCK_WEBAPI) {
     try {
@@ -811,9 +800,16 @@ if (MOCK_WEBAPI) {
     main(incoming);
 } else {
     console.log("fetching a live blank ballot");
-    asyncFetchData(getBlankBallotURL).then(function(response){
-        // Access the value inside the `then`
-        console.log("retrieved the live blank ballot");
-        main(response.blank_ballot);
-    })
+    // Need the JSON data for just about everything.  However, the way to get
+    // external json is with a fetch, which is asynchronous.  Which means that
+    // 'just about everything' on this page needs to run within the callback to
+    // the async function (called only when !MOCK_WEBAPI).
+    fetch(getBlankBallotURL)
+        .then(response => response.json())
+        .then(json => {
+            // Access the value inside the `then`
+            console.log("retrieved the live blank ballot");
+            main(json.blank_ballot);
+        })
+        .catch(error => console.log(error));
 }
