@@ -18,6 +18,7 @@ var blankBallot = null;
 const selectBackgroundColor = "#f5f5f5";
 const extraSpace = "&nbsp&nbsp";
 const getBlankBallotURL =  "http://127.0.0.1:8000/web-api/get_blank_ballot";
+const castBallotURL =  "http://127.0.0.1:8000/web-api/cast_ballot";
 
 // Define a YouAreThere inline glyph
 const yrhIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -468,7 +469,7 @@ function setupBottomNavigation(thisContestNum, nextContestNum, thisContestValue)
 }
 
 // Helper function to color JSON
-function nullifySession() {
+function nullifyVotingSession() {
     blankBallot = null;
     listOfContests.length = 0;
 }
@@ -483,11 +484,36 @@ function setupVoteButtonListener(buttonString, rootElement) {
     newButton.addEventListener("click", function (e) {
         console.log("Running '" + buttonString + "' eventListener");
         if (buttonString == "VOTE") {
-            setupReceiptPage();
+            if (MOCK_WEBAPI) {
+                try {
+                    console.log("parsing mock blank receipt");
+                    setupReceiptPage(JSON.parse(receiptJSON));
+                } catch (e) {
+                    console.error(e);
+                }
+            } else {
+                // fetch via a post (inline here) the completed ballot and pass
+                // setupReceiptPage(...) as the callback
+                console.log("sending the completed ballot; waiting on receipt");
+                fetch(castBallotURL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(blankBallot)})
+                    .then(response => response.json())
+                    .then(json => {
+                        // Access json only inside the `then`
+                        console.log("retrieved the live ballot receipt");
+                        setupReceiptPage(json);
+                    })
+                    .catch(error => console.log("ballot POST returned an error: " + error));
+            }
         } else if (buttonString == "Spoil Ballot") {
             // For now, just print something, destroy the blankBallot,
             // and go to home page
-            nullifySession();
+            nullifyVotingSession();
             const newItem = document.createElement("p");
             newItem.innerHTML = "Your ballot has been destroyed.  To vote, click the start over button below";
             rootElement.appendChild(newItem);
@@ -726,15 +752,85 @@ function setupNewContest(thisContestNum) {
     setupProgressBarNavigation(thisContestNum, thisContestValue);
 }
 
-// Voting is completed - show the receipt
-function setupReceiptPage() {
-    // Send the blankBallot object to the web-api endpoint.
-    // ZZZ TBD
+// Display the receipt:
+// Place the ballotCheck in upperSection with the inserted links.
+// - digests point to the contest-cvr.html page
+// - row headers point to the verify-ballot-check.html page
+// - column headers point to the tally-election.html page
+function createReceiptTable(ballotCheck) {
+    const numberOfRows = ballotCheck.length;
+    const numberOfColumns = ballotCheck[0].length;
+    if (numberOfColumns < 2 || numberOfRows < 2) {
+        throw new Error("javascript error: the ballot check is effectively empty");
+    }
+    const rootElement = document.getElementById("lowerSection");
+    const table = document.createElement("table");
+    const caption = document.createElement("caption");
+    caption.innerTest = "Ballot Check";
+    table.appendChild(caption);
+    table.classList.add("receiptTable");
+    for (let index = 0; index < numberOfRows; index++) {
+        let row = document.createElement("tr");
+        if (index == 0 || (index % 34 == 0)) {
+            // table header line
+            let innerText = "";
+            for (let colIndex = 0; colIndex <  numberOfColumns; colIndex++) {
+                let headerText = "";
+                if (colIndex == 0) {
+                    headerText = `<th>row index</th>`;
+                } else {
+                    headerText = `<th><a  href="tally-election.html?contest=${ballotCheck[0][colIndex].split(' - ', 2)[0]}" target="_blank">${ballotCheck[0][colIndex].split(' - ', 2)[1]}</a></th>`;
+                }
+                innerText += headerText;
+            }
+            row.innerHTML = innerText;
+            table.appendChild(row);
+            // If this is the first table header, loop
+            if (index == 0) {
+                continue;
+            }
+            // if still here, create a new row
+            row = document.createElement("tr");
+        }
+        // normal ballot receipt line
+        // First column is a verify-ballot-check.html link
+        let innerText = "";
+        // The other columns are digest links
+        let digests = [];
+        for (let colIndex = 1; colIndex <  numberOfColumns; colIndex++) {
+            const digest = ballotCheck[index][colIndex];
+            digests.push(digest);
+            innerText += `<td><a target="_blank" class="receiptTD" href="contest-cvr.html?digest=${digest}">${digest}</a></td>`;
+        }
+        innerText = `<th><a target="_blank" class="receiptTH" href="verify-ballot-check.html?digests=${digests.join(',')}">${index}</a></th>${innerText}`;
+        row.innerHTML = innerText;
+        table.appendChild(row);
+    }
+    rootElement.appendChild(table);
+}
 
-    // For now log it
-    console.log(blankBallot);
-    // ZZZ for the demo, destroy the blankBallot as well
-    nullifySession();
+// Create a function to fade out the element
+function fadeOut(receiptObject, fade) {
+    let opacity = 1.0;
+    const intervalID = setInterval(function() {
+        if (opacity > 0) {
+            opacity = opacity - 0.05
+            fade.style.opacity = opacity;
+            console.log("setInterval fade");
+        } else {
+            // wipe out the row data
+            fade.style.display = 'none';
+            fade.innerText = "";
+            receiptObject["ballot_row"] = null;
+            clearInterval(intervalID);
+            console.log("setInterval cleared");
+        }
+    }, 200);
+}
+
+function setupReceiptPage(ballotReceiptObject) {
+    // Clear out the completed blank ballot
+    nullifyVotingSession();
 
     // Clear out progressBar and progressBar stylesheet - remove everything
     const progressBar = document.getElementById("progressBar");
@@ -764,20 +860,20 @@ function setupReceiptPage() {
     upperSection.appendChild(upperSpan);
 
     // Create the table (this creates the receipt DOM)
-    createReceiptTable();
+    createReceiptTable(ballotReceiptObject.ballot_check);
 
     // Set the row number
-    setRowNumber();
+    document.getElementById("rowIndex").innerText = ballotReceiptObject.ballot_row;
 
     // Fade the row number
-    fadeOut();
+    fadeOut(ballotReceiptObject, document.getElementById("rowIndex"));
 }
 
 // ################
 // __main__
 // ################
 function main(incomingBB) {
-    // Get the number of contests
+    // No javascript classes here - set these three globals:
     blankBallot = incomingBB;
     listOfContests = incomingBB.contests;
     numberOfContests = incomingBB.contests.length;
@@ -807,9 +903,9 @@ if (MOCK_WEBAPI) {
     fetch(getBlankBallotURL)
         .then(response => response.json())
         .then(json => {
-            // Access the value inside the `then`
+            // Access json only inside the `then`
             console.log("retrieved the live blank ballot");
             main(json.blank_ballot);
         })
-        .catch(error => console.log(error));
+        .catch(error => console.log("blank ballot fetch returned an error: " + error));
 }

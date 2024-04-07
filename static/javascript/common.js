@@ -1,28 +1,6 @@
 // Some global constants
 const MOCK_WEBAPI = false;
 
-// post data to the web-api via POST
-async function postData(url, data) {
-    try {
-        const response = await fetch(url, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify(data),
-        });
-        if (!response.ok) {
-            throw new Error(`Network response was not ok: ${response.status}`);
-        }
-        const responseData = await response.json();
-        console.log(responseData);
-        return responseData;
-    } catch (error) {
-        console.error("Error posting data:", error);
-    }
-}
-
 // Color JSON strings
 function syntaxHighlightJSON(jsonString, digestURL=null, contestNumber=null) {
     let newString = jsonString.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
