@@ -13,6 +13,7 @@ var listOfContests = [];
 var numberOfContests = 0;
 // A global to store the actual incoming blank ballot
 var blankBallot = null;
+var guidClientStore = null;
 
 // Various constants
 const selectBackgroundColor = "#f5f5f5";
@@ -829,6 +830,9 @@ function fadeOut(receiptObject, fade) {
 }
 
 function setupReceiptPage(ballotReceiptObject) {
+    // For now store the GUID
+    guidClientStore = ballotReceiptObject.vote_store_id;
+
     // Clear out the completed blank ballot
     nullifyVotingSession();
 
