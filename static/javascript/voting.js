@@ -500,7 +500,8 @@ function setupVoteButtonListener(buttonString, rootElement) {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        'Accept': 'application/json'
+                        "Accept": "application/json",
+                        "charset": "utf-8"
                     },
                     body: JSON.stringify(blankBallot)})
                     .then(response => response.json())
