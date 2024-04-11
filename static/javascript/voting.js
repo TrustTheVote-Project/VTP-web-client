@@ -777,11 +777,9 @@ function createReceiptTable(ballotCheck) {
             // table header line
             let innerText = "";
             for (let colIndex = 0; colIndex <  numberOfColumns; colIndex++) {
-                let headerText = "";
+                let headerText = `<th><a  href="tally-contests.html?contests=${ballotCheck[0][colIndex].split(' - ', 2)[0]}" target="_blank">${ballotCheck[0][colIndex].split(' - ', 2)[1]}</a></th>`;
                 if (colIndex == 0) {
-                    headerText = `<th>row index</th>`;
-                } else {
-                    headerText = `<th><a  href="tally-contests.html?contests=${ballotCheck[0][colIndex].split(' - ', 2)[0]}" target="_blank">${ballotCheck[0][colIndex].split(' - ', 2)[1]}</a></th>`;
+                    headerText = `<th>row index</th>` + headerText;
                 }
                 innerText += headerText;
             }
@@ -799,7 +797,7 @@ function createReceiptTable(ballotCheck) {
         let innerText = "";
         // The other columns are digest links
         let digests = [];
-        for (let colIndex = 1; colIndex <  numberOfColumns; colIndex++) {
+        for (let colIndex = 0; colIndex <  numberOfColumns; colIndex++) {
             const digest = ballotCheck[index][colIndex];
             digests.push(digest);
             innerText += `<td><a target="_blank" class="receiptTD" href="show-contest.html?digest=${digest}">${digest}</a></td>`;

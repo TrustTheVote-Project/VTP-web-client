@@ -33,6 +33,7 @@ if (MOCK_WEBAPI) {
     const urlParams = new URLSearchParams(window.location.search);
     const contests = urlParams.get('contests');
     const digests = urlParams.get('digests');
+    const verbosity = urlParams.get('verbosity');
     console.log("fetching the tally-contests output for contest(s) " + contests);
     console.log("while tracking digest(s) " + digests);
     // Need the JSON data for just about everything.  However, the way to get
@@ -42,6 +43,9 @@ if (MOCK_WEBAPI) {
     let url = tallyContestsURL + "/" + contests;
     if (digests) {
         url += "/" + digests
+        url += "/" + verbosity
+    } else {
+        url += "/null/" + verbosity
     }
     fetch(url)
         .then(response => response.json())
