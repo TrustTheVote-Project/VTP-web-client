@@ -756,9 +756,9 @@ function setupNewContest(thisContestNum) {
 
 // Display the receipt:
 // Place the ballotCheck in upperSection with the inserted links.
-// - digests point to the contest-cvr.html page
-// - row headers point to the verify-ballot-check.html page
-// - column headers point to the tally-election.html page
+// - digests point to the show-contest.html page
+// - row headers point to the verify-ballot-row.html page
+// - column headers point to the tally-contests.html page
 function createReceiptTable(ballotCheck) {
     const numberOfRows = ballotCheck.length;
     const numberOfColumns = ballotCheck[0].length;
@@ -781,7 +781,7 @@ function createReceiptTable(ballotCheck) {
                 if (colIndex == 0) {
                     headerText = `<th>row index</th>`;
                 } else {
-                    headerText = `<th><a  href="tally-election.html?contest=${ballotCheck[0][colIndex].split(' - ', 2)[0]}" target="_blank">${ballotCheck[0][colIndex].split(' - ', 2)[1]}</a></th>`;
+                    headerText = `<th><a  href="tally-contests.html?contests=${ballotCheck[0][colIndex].split(' - ', 2)[0]}" target="_blank">${ballotCheck[0][colIndex].split(' - ', 2)[1]}</a></th>`;
                 }
                 innerText += headerText;
             }
@@ -795,16 +795,16 @@ function createReceiptTable(ballotCheck) {
             row = document.createElement("tr");
         }
         // normal ballot receipt line
-        // First column is a verify-ballot-check.html link
+        // First column is a verify-ballot-row.html link
         let innerText = "";
         // The other columns are digest links
         let digests = [];
         for (let colIndex = 1; colIndex <  numberOfColumns; colIndex++) {
             const digest = ballotCheck[index][colIndex];
             digests.push(digest);
-            innerText += `<td><a target="_blank" class="receiptTD" href="contest-cvr.html?digest=${digest}">${digest}</a></td>`;
+            innerText += `<td><a target="_blank" class="receiptTD" href="show-contest.html?digest=${digest}">${digest}</a></td>`;
         }
-        innerText = `<th><a target="_blank" class="receiptTH" href="verify-ballot-check.html?digests=${digests.join(',')}">${index}</a></th>${innerText}`;
+        innerText = `<th><a target="_blank" class="receiptTH" href="verify-ballot-row.html?digests=${digests.join(',')}">${index}</a></th>${innerText}`;
         row.innerHTML = innerText;
         table.appendChild(row);
     }

@@ -18,7 +18,7 @@ function syntaxHighlightJSON(jsonString, digestURL=null, contestNumber=null) {
                     let link_p = false;
                     newMatch = newMatch.replace(/([a-fA-F0-9]{40})/g, function (match) {
                         link_p = true;
-                        return `<a target="_blank" href=${digestURL}?contestNumber=${contestNumber}&digests=${match}>${match}</a>`;
+                        return `<a target="_blank" href=${digestURL}?contests=${contestNumber}&digests=${match}>${match}</a>`;
                     });
                     if (link_p) {
                         return newMatch;

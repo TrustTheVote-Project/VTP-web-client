@@ -9,7 +9,7 @@ function displayLog(git_log, digestURL) {
 }
 
 // Adds an explicit tally button
-function addTallyButton(contest, digest) {
+function addTallyButton(contestUID, digest) {
     const rootElement = document.getElementById("upperSection");
     const tallyButton = document.createElement("button");
     tallyButton.innerText = "Tally Contest";
@@ -17,7 +17,7 @@ function addTallyButton(contest, digest) {
     // add an event listener to the button
     tallyButton.addEventListener("click", function (e) {
         console.log("Running 'Tally Contest' button");
-        window.open(`tally-contests.html?contest=${contest}&digests=${digest}`, "_blank").focus();
+        window.open(`tally-contests.html?contests=${contestUID}&digests=${digest}`, "_blank").focus();
     });
     const table = document.createElement("table");
     table.classList.add("tableStyle");
@@ -35,9 +35,9 @@ function addTallyButton(contest, digest) {
 // ################
 function main(incoming) {
     // Get the git log
-    displayLog(incoming, "tally-contest.html");
+    displayLog(incoming, "tally-contests.html");
     // Add a button
-    addTallyButton(incoming.Log.contestCVR.contest_name, incoming.commit);
+    addTallyButton(incoming.Log.contestCVR.uid, incoming.commit);
 }
 
 // To mock or not to mock
@@ -63,7 +63,7 @@ if (MOCK_WEBAPI) {
         .then(json => {
             // Access json only inside the `then`
             console.log("retrieved the contest CVR for " + digest);
-            console.log("contestCVR: " + json.git_log)
+            console.log("contestCVR: " + json.git_log.Log)
             main(json.git_log);
         })
         .catch(error => console.log("contest CVR fetch returned an error: " + error));

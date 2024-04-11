@@ -1,4 +1,5 @@
 // Used exclusively for User Story #5 - verify-ballot.html
+const verifyBallotRowURL =  "http://127.0.0.1:8000/web-api/verify_ballot_row";
 
 // Need the JSON data for just about everything
 // Create the ballotCheck javascript object from the blankBallotJSON JSON object literal
