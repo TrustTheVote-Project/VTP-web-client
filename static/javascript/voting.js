@@ -797,12 +797,15 @@ function createReceiptTable(ballotCheck) {
         let innerText = "";
         // The other columns are digest links
         let digests = [];
+        let uids = [];
         for (let colIndex = 0; colIndex <  numberOfColumns; colIndex++) {
             const digest = ballotCheck[index][colIndex];
+            const uid = ballotCheck[0][colIndex].match(/^\d{4}/);
             digests.push(digest);
+            uids.push(uid);
             innerText += `<td><a target="_blank" class="receiptTD" href="show-contest.html?digest=${digest}">${digest}</a></td>`;
         }
-        innerText = `<th><a target="_blank" class="receiptTH" href="verify-ballot-row.html?digests=${digests.join(',')}">${index}</a></th>${innerText}`;
+        innerText = `<th><a target="_blank" class="receiptTH" href="verify-ballot-row.html?uids=${uids.join(',')}&digests=${digests.join(',')}">${index}</a></th>${innerText}`;
         row.innerHTML = innerText;
         table.appendChild(row);
     }
