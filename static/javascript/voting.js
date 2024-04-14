@@ -13,7 +13,7 @@ var listOfContests = [];
 var numberOfContests = 0;
 // A global to store the actual incoming blank ballot
 var blankBallot = null;
-var guidClientStore = null;
+var vote_store_id = null;
 
 // Various constants
 const selectBackgroundColor = "#f5f5f5";
@@ -488,6 +488,7 @@ function setupVoteButtonListener(buttonString, rootElement) {
             if (MOCK_WEBAPI) {
                 try {
                     console.log("parsing mock blank receipt");
+                    receiptJSON["vote_store_id"] = MOCK_GUID;
                     setupReceiptPage(JSON.parse(receiptJSON));
                 } catch (e) {
                     console.error(e);
@@ -777,7 +778,7 @@ function createReceiptTable(ballotCheck) {
             // table header line
             let innerText = "";
             for (let colIndex = 0; colIndex <  numberOfColumns; colIndex++) {
-                let headerText = `<th><a  href="tally-contests.html?contests=${ballotCheck[0][colIndex].split(' - ', 2)[0]}" target="_blank">${ballotCheck[0][colIndex].split(' - ', 2)[1]}</a></th>`;
+                let headerText = `<th><a  href="tally-contests.html?vote_store_id=${vote_store_id}&contests=${ballotCheck[0][colIndex].split(' - ', 2)[0]}" target="_blank">${ballotCheck[0][colIndex].split(' - ', 2)[1]}</a></th>`;
                 if (colIndex == 0) {
                     headerText = `<th>row index</th>` + headerText;
                 }
@@ -803,9 +804,9 @@ function createReceiptTable(ballotCheck) {
             const uid = ballotCheck[0][colIndex].match(/^\d{4}/);
             digests.push(digest);
             uids.push(uid);
-            innerText += `<td><a target="_blank" class="receiptTD" href="show-contest.html?digest=${digest}">${digest}</a></td>`;
+            innerText += `<td><a target="_blank" class="receiptTD" href="show-contest.html?vote_store_id=${vote_store_id}&digest=${digest}">${digest}</a></td>`;
         }
-        innerText = `<th><a target="_blank" class="receiptTH" href="verify-ballot-row.html?uids=${uids.join(',')}&digests=${digests.join(',')}">${index}</a></th>${innerText}`;
+        innerText = `<th><a target="_blank" class="receiptTH" href="verify-ballot-row.html?vote_store_id=${vote_store_id}&uids=${uids.join(',')}&digests=${digests.join(',')}">${index}</a></th>${innerText}`;
         row.innerHTML = innerText;
         table.appendChild(row);
     }
@@ -832,8 +833,8 @@ function fadeOut(receiptObject, fade) {
 }
 
 function setupReceiptPage(ballotReceiptObject) {
-    // For now store the GUID
-    guidClientStore = ballotReceiptObject.vote_store_id;
+    // For now store the (global) GUID
+    vote_store_id = ballotReceiptObject.vote_store_id;
 
     // Clear out the completed blank ballot
     nullifyVotingSession();

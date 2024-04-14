@@ -1,8 +1,9 @@
 // Some global constants
 const MOCK_WEBAPI = false;
+const MOCK_GUID = "01d963fd74100ee3f36428740a8efd8afd781839";
 
 // Color JSON strings
-function syntaxHighlightJSON(jsonString, digestURL=null, contestNumber=null) {
+function syntaxHighlightJSON(vote_store_id, jsonString, digestURL=null, contestNumber=null) {
     let newString = jsonString.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     newString = newString.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
         var cls = 'JSONnumber';
@@ -18,7 +19,7 @@ function syntaxHighlightJSON(jsonString, digestURL=null, contestNumber=null) {
                     let link_p = false;
                     newMatch = newMatch.replace(/([a-fA-F0-9]{40})/g, function (match) {
                         link_p = true;
-                        return `<a target="_blank" href=${digestURL}?contests=${contestNumber}&digests=${match}>${match}</a>`;
+                        return `<a target="_blank" href=${digestURL}?vote_store_id=${vote_store_id}&contests=${contestNumber}&digests=${match}>${match}</a>`;
                     });
                     if (link_p) {
                         return newMatch;
@@ -37,7 +38,7 @@ function syntaxHighlightJSON(jsonString, digestURL=null, contestNumber=null) {
 }
 
 // Color STDOUT log strings, which is passed as an array of strings (one per line)
-function syntaxHighlightStdout(jsonArray, digestURL=null, tallyURL=null) {
+function syntaxHighlightStdout(vote_store_id, jsonArray, digestURL=null, tallyURL=null) {
     // Handle digest links
     let newOutput = []
     for (let line of jsonArray) {
@@ -46,12 +47,12 @@ function syntaxHighlightStdout(jsonArray, digestURL=null, tallyURL=null) {
         // Convert digests to hrefs
         newLine = newLine.replace(/\b([a-fA-F0-9]{40})\b/, function (match) {
             digest = match;
-            return `<a target="_blank" href=${digestURL}?digest=${digest}>${digest}</a>`;
+            return `<a target="_blank" href=${digestURL}?vote_store_id=${vote_store_id}&digest=${digest}>${digest}</a>`;
         });
         // Convert contest uids to hrefs
         if (digest) {
             newLine = newLine.replace(/\b([0-9]{4}\b)/, function (match) {
-                return `<a target="_blank" href=${tallyURL}?contest=${match}&digests=${digest}>${match}</a>`;
+                return `<a target="_blank" href=${tallyURL}?vote_store_id=${vote_store_id}&contest=${match}&digests=${digest}>${match}</a>`;
             });
         }
         // Handle GOOD and BAD lines
