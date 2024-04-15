@@ -44,6 +44,9 @@ if (MOCK_WEBAPI) {
         .then(response => response.json())
         .then(json => {
             // Access json only inside the `then`
+            if (json.error) {
+                throw new Error(json.error);
+            }
             console.log("retrieved the row validation (id=" + vote_store_id + ")");
             main(vote_store_id, json.verify_ballot_stdout);
         })

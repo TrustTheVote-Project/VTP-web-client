@@ -508,6 +508,9 @@ function setupVoteButtonListener(buttonString, rootElement) {
                     .then(response => response.json())
                     .then(json => {
                         // Access json only inside the `then`
+                        if (json.error) {
+                            throw new Error(json.error);
+                        }
                         console.log("retrieved the live ballot receipt");
                         setupReceiptPage(json);
                     })
@@ -911,6 +914,9 @@ if (MOCK_WEBAPI) {
         .then(response => response.json())
         .then(json => {
             // Access json only inside the `then`
+            if (json.error) {
+                throw new Error(json.error);
+            }
             console.log("retrieved the live blank ballot");
             main(json.blank_ballot);
         })

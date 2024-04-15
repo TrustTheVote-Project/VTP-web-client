@@ -74,6 +74,9 @@ if (MOCK_WEBAPI) {
         .then(response => response.json())
         .then(json => {
             // Access json only inside the `then`
+            if (json.error) {
+                throw new Error(json.error);
+            }
             console.log("retrieved the contest CVR for " + digest);
             console.log("contestCVR: " + json.git_log.Log)
             main(vote_store_id, json.git_log);
