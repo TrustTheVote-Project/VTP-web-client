@@ -53,25 +53,25 @@ That specific ballot receipt is displayed.  If voting, the voter's row offset in
   - each row heading is clickable - takes the user to that verify-ballot-check.html page
   - each column heading is clickable - takes the user to that tally-election.html page (no digest tracking)
   
-See ProjectPlan.md - receipt.html
+Note - this is handled by the voting.html page.  The act of voting generates a vote\_store_id which is then required for further interactions by the end user/voter.
 
 ## User Story 4 - inspecting contest CVRs
 
 #### What happens when the user wants to inspect a specific contest CVR?
 
-TBD - see ProjectPlan.md - contest-cvr.html
+TBD - see ProjectPlan.md - show-contest.html
 
 ## User Story 5 - verifying the ballot check
 
 #### What happens when the user wants to verify their ballot check?
 
-TBD - see ProjectPlan.md - verify-ballot-check.html
+TBD - see ProjectPlan.md - verify-ballot-row.html
 
 ## User Story 6 - tallying the election
 
 #### What happens when the user wants to tally the election?
 
-TBD - see ProjectPlan.md - tally-election.html
+TBD - see ProjectPlan.md - tally-contests.html
 
 ## General client <-> web-api <-> backend spring demo #2 data flow
 
@@ -92,8 +92,8 @@ TBD - see ProjectPlan.md - tally-election.html
      - creates the vote\_store_id GUID first
      - then calls the backend to cast the ballot
      - if successful returns the GUID and the receipt
- - note - the existing http://127.0.0.1/receipt.html page is deleted and the javascript moved to the voting.js page so that voting.js also handles displaying the receipt by re-writing the DOM
-3. while viewing the receipt contest, user can click to create new tabs for contest-cvr, verify, and tally
-4. contest-cvr - http://127.0.0.1/contest-cvr.index?GUID (with endpoints having the GUID embedded in the path)
-5. verify-ballot - http://127.0.0.1/verify-ballot.html?GUID
-6. tally-contest - http://127.0.0.1/tally-contest.html?GUID
+ - note - voting.js also handles displaying the receipt by re-writing the DOM
+3. while viewing the receipt contest (via voting.html), user can click to create new tabs for contest-cvr, verify, and tally
+4. contest-cvr - http://127.0.0.1/show-contest.index?GUID (with endpoints having the GUID embedded in the path)
+5. verify-ballot - http://127.0.0.1/verify-ballot-row.html?GUID
+6. tally-contest - http://127.0.0.1/tally-contests.html?GUID
