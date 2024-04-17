@@ -508,8 +508,8 @@ function setupVoteButtonListener(buttonString, rootElement) {
                     .then(response => response.json())
                     .then(json => {
                         // Access json only inside the `then`
-                        if (json.error) {
-                            throw new Error(json.error);
+                        if (json.webapi_error) {
+                            throw new Error(json.webapi_error);
                         }
                         console.log("retrieved the live ballot receipt");
                         setupReceiptPage(json);
@@ -758,64 +758,6 @@ function setupNewContest(thisContestNum) {
     setupProgressBarNavigation(thisContestNum, thisContestValue);
 }
 
-// Display the receipt:
-// Place the ballotCheck in upperSection with the inserted links.
-// - digests point to the show-contest.html page
-// - row headers point to the verify-ballot-row.html page
-// - column headers point to the tally-contests.html page
-function createReceiptTable(ballotCheck) {
-    const numberOfRows = ballotCheck.length;
-    const numberOfColumns = ballotCheck[0].length;
-    if (numberOfColumns < 2 || numberOfRows < 2) {
-        throw new Error("javascript error: the ballot check is effectively empty");
-    }
-    const rootElement = document.getElementById("lowerSection");
-    const table = document.createElement("table");
-    const caption = document.createElement("caption");
-    caption.innerTest = "Ballot Check";
-    table.appendChild(caption);
-    table.classList.add("receiptTable");
-    for (let index = 0; index < numberOfRows; index++) {
-        let row = document.createElement("tr");
-        if (index == 0 || (index % 34 == 0)) {
-            // table header line
-            let innerText = "";
-            for (let colIndex = 0; colIndex <  numberOfColumns; colIndex++) {
-                let headerText = `<th><a  href="tally-contests.html?vote_store_id=${vote_store_id}&contests=${ballotCheck[0][colIndex].split(' - ', 2)[0]}" target="_blank">${ballotCheck[0][colIndex].split(' - ', 2)[1]}</a></th>`;
-                if (colIndex == 0) {
-                    headerText = `<th>row index</th>` + headerText;
-                }
-                innerText += headerText;
-            }
-            row.innerHTML = innerText;
-            table.appendChild(row);
-            // If this is the first table header, loop
-            if (index == 0) {
-                continue;
-            }
-            // if still here, create a new row
-            row = document.createElement("tr");
-        }
-        // normal ballot receipt line
-        // First column is a verify-ballot-row.html link
-        let innerText = "";
-        // The other columns are digest links
-        let digests = [];
-        let uids = [];
-        for (let colIndex = 0; colIndex <  numberOfColumns; colIndex++) {
-            const digest = ballotCheck[index][colIndex];
-            const uid = ballotCheck[0][colIndex].match(/^\d{4}/);
-            digests.push(digest);
-            uids.push(uid);
-            innerText += `<td><a target="_blank" class="receiptTD" href="show-contest.html?vote_store_id=${vote_store_id}&digest=${digest}">${digest}</a></td>`;
-        }
-        innerText = `<th><a target="_blank" class="receiptTH" href="verify-ballot-row.html?vote_store_id=${vote_store_id}&uids=${uids.join(',')}&digests=${digests.join(',')}">${index}</a></th>${innerText}`;
-        row.innerHTML = innerText;
-        table.appendChild(row);
-    }
-    rootElement.appendChild(table);
-}
-
 // Create a function to fade out the element
 function fadeOut(receiptObject, fade) {
     let opacity = 1.0;
@@ -870,7 +812,7 @@ function setupReceiptPage(ballotReceiptObject) {
     upperSection.appendChild(upperSpan);
 
     // Create the table (this creates the receipt DOM)
-    createReceiptTable(ballotReceiptObject.ballot_check);
+    createReceiptTable(ballotReceiptObject, vote_store_id);
 
     // Set the row number
     document.getElementById("rowIndex").innerText = ballotReceiptObject.ballot_row;
@@ -914,8 +856,8 @@ if (MOCK_WEBAPI) {
         .then(response => response.json())
         .then(json => {
             // Access json only inside the `then`
-            if (json.error) {
-                throw new Error(json.error);
+            if (json.webapi_error) {
+                throw new Error(json.webapi_error);
             }
             console.log("retrieved the live blank ballot");
             main(json.blank_ballot);

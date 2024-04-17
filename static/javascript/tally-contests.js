@@ -52,8 +52,8 @@ if (MOCK_WEBAPI) {
         .then(response => response.json())
         .then(json => {
             // Access json only inside the `then`
-            if (json.error) {
-                throw new Error(json.error);
+            if (json.webapi_error) {
+                throw new Error(json.webapi_error);
             }
             console.log("retrieved the tally for contest(s) " + contests);
             main(vote_store_id, json.tally_election_stdout);
