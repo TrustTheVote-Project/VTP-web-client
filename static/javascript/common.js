@@ -52,7 +52,7 @@ function syntaxHighlightStdout(vote_store_id, jsonArray, digestURL=null, tallyUR
         // Convert contest uids to hrefs
         if (digest) {
             newLine = newLine.replace(/\b([0-9]{4}\b)/, function (match) {
-                return `<a target="_blank" href=${tallyURL}?vote_store_id=${vote_store_id}&contest=${match}&digests=${digest}>${match}</a>`;
+                return `<a target="_blank" href=${tallyURL}?vote_store_id=${vote_store_id}&contests=${match}&digests=${digest}>${match}</a>`;
             });
         }
         // Handle GOOD and BAD lines
@@ -92,17 +92,6 @@ function createReceiptTable(ballotCheckObject, vote_store_id) {
         throw new Error("javascript error: the ballot check is effectively empty");
     }
     const rootElement = document.getElementById("lowerSection");
-
-    if (ballotCheckObject.encoded_qr) {
-        const svgRootElement = document.getElementById("upperSection");
-        // get the svg text and wrap it in an anchor tag
-        let qrElement = document.createElement("span");
-        let decodedQR = atob(ballotCheckObject.encoded_qr);
-        const qrSvg = decodedQR.substring(decodedQR.indexOf("\n") + 1);
-        // Create an explicit link to the show-commit.html page
-        qrElement.innerHTML = `<a target="_blank" href="show-versioned-receipt.html?vote_store_id=${vote_store_id}&digest=${ballotCheckObject.receipt_digest}">${qrSvg}</a>`;
-        svgRootElement.appendChild(qrElement);
-    }
 
     // Create the ballot check table
     const table = document.createElement("table");

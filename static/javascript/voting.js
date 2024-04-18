@@ -811,6 +811,22 @@ function setupReceiptPage(ballotReceiptObject) {
 <h2>Your row number is: <span id="tofade" class="visible"><span id="rowIndex">null</span></span></h2></th><th>&nbsp&nbsp(disappears in 5 seconds)</th></tr></table>`;
     upperSection.appendChild(upperSpan);
 
+    if (ballotReceiptObject.encoded_qr) {
+        // get the svg text and wrap it in an anchor tag
+        let qrElement = document.createElement("div");
+        let qrLink = document.createElement("div");
+        let decodedQR = atob(ballotReceiptObject.encoded_qr);
+        let qrSvg = decodedQR.substring(decodedQR.indexOf("\n") + 1);
+        // ZZZ - 2024/04/18: the QR code is coming up blank.  One thought
+        // is that the color has not been set to black TBD.
+        qrSvg = '<svg fill="currentColor" color="black" ' + qrSvg.substring(5);
+        // Create an explicit link to the show-commit.html page
+        qrElement.innerHTML = qrSvg;
+        qrLink.innerHTML = `<a target="_blank" href="show-versioned-receipt.html?vote_store_id=${vote_store_id}&digest=${ballotReceiptObject.receipt_digest}">Click me</a>`;
+        upperSpan.appendChild(qrElement);
+        upperSpan.appendChild(qrLink)
+    }
+
     // Create the table (this creates the receipt DOM)
     createReceiptTable(ballotReceiptObject, vote_store_id);
 
