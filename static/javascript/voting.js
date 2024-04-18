@@ -1,39 +1,25 @@
 // Used exclusively for User Story #2 - voting.html
 
-// Need the JSON data for just about everything
-// Create the blankBallot javascript object from the blankBallotJSON JSON object literal
-var blankBallot = null;
-try {
-    blankBallot = JSON.parse(blankBallotJSON);
-} catch (e) {
-    console.error(e);
-}
-
 // Note - for the moment let these be globals (until we know more).
 // Regardless, the upper/lower setup will make sure choiceList and
 // sortableList are already defined.
 var choiceList = null;
 var sortableList = null;
 var removeButtons = null;
-// Don't know how to implement a closure or equivilent yet
+// Don't know how to implement a closure or equivilent yet - this is a global
+// to store how many choices have been so far selected in a RCV contest.
 var selectedCount = 0;
+var listOfContests = [];
+var numberOfContests = 0;
+// A global to store the actual incoming blank ballot
+var blankBallot = null;
+var vote_store_id = null;
 
-// Odds and ends
+// Various constants
 const selectBackgroundColor = "#f5f5f5";
 const extraSpace = "&nbsp&nbsp";
-
-// Get the number of contests
-const listOfContests = [];
-function _initialize() {
-    let count = 0;
-    for (const contest of blankBallot.contests) {
-        listOfContests[count] = contest;
-        count += 1;
-    }
-    return count;
-}
-const numberOfContests = _initialize();
-console.log("there are " + numberOfContests + " contest(s)");
+const getBlankBallotURL =  "http://127.0.0.1:8000/web-api/get_blank_ballot";
+const castBallotURL =  "http://127.0.0.1:8000/web-api/cast_ballot";
 
 // Define a YouAreThere inline glyph
 const yrhIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -484,7 +470,7 @@ function setupBottomNavigation(thisContestNum, nextContestNum, thisContestValue)
 }
 
 // Helper function to color JSON
-function nullifySession() {
+function nullifyVotingSession() {
     blankBallot = null;
     listOfContests.length = 0;
 }
@@ -499,17 +485,41 @@ function setupVoteButtonListener(buttonString, rootElement) {
     newButton.addEventListener("click", function (e) {
         console.log("Running '" + buttonString + "' eventListener");
         if (buttonString == "VOTE") {
-            // Send the blankBallot object to the web-api endpoint.
-            // ZZZ
-            // For now, just print it to the page
-            let jsonString = JSON.stringify(blankBallot, undefined, 2);
-            rootElement.appendChild(document.createElement('pre')).innerHTML = syntaxHighlightJSON(jsonString);
-            // ZZZ for the demo, destroy the blankBallot as well
-            nullifySession();
+            if (MOCK_WEBAPI) {
+                try {
+                    console.log("parsing mock blank receipt");
+                    receiptJSON["vote_store_id"] = MOCK_GUID;
+                    setupReceiptPage(JSON.parse(receiptJSON));
+                } catch (e) {
+                    console.error(e);
+                }
+            } else {
+                // fetch via a post (inline here) the completed ballot and pass
+                // setupReceiptPage(...) as the callback
+                console.log("sending the completed ballot; waiting on receipt");
+                fetch(castBallotURL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json",
+                        "charset": "utf-8"
+                    },
+                    body: JSON.stringify(blankBallot)})
+                    .then(response => response.json())
+                    .then(json => {
+                        // Access json only inside the `then`
+                        if (json.webapi_error) {
+                            throw new Error(json.webapi_error);
+                        }
+                        console.log("retrieved the live ballot receipt");
+                        setupReceiptPage(json);
+                    })
+                    .catch(error => console.log("ballot POST returned an error: " + error));
+            }
         } else if (buttonString == "Spoil Ballot") {
             // For now, just print something, destroy the blankBallot,
             // and go to home page
-            nullifySession();
+            nullifyVotingSession();
             const newItem = document.createElement("p");
             newItem.innerHTML = "Your ballot has been destroyed.  To vote, click the start over button below";
             rootElement.appendChild(newItem);
@@ -666,7 +676,7 @@ function setupCheckout() {
     //      casts it, returning the ballot receipt and row number
     const spoilButton = setupVoteButtonListener("Spoil Ballot", rootElement);
     const voteButton = setupVoteButtonListener("VOTE", rootElement);
-    // Create the table and add it
+    // Create the table and add them
     const voteTable = document.createElement("table");
     voteTable.classList.add("tableStyle");
     const row1 = document.createElement("tr");
@@ -748,8 +758,125 @@ function setupNewContest(thisContestNum) {
     setupProgressBarNavigation(thisContestNum, thisContestValue);
 }
 
-// If here, this is the first contest
-// set up the bars once
-setupProgressBars(numberOfContests);
-// set up the first contest
-setupNewContest(0);
+// Create a function to fade out the element
+function fadeOut(receiptObject, fade) {
+    let opacity = 1.0;
+    const intervalID = setInterval(function() {
+        if (opacity > 0) {
+            opacity = opacity - 0.05
+            fade.style.opacity = opacity;
+            console.log("setInterval fade");
+        } else {
+            // wipe out the row data
+            fade.style.display = 'none';
+            fade.innerText = "";
+            receiptObject["ballot_row"] = null;
+            clearInterval(intervalID);
+            console.log("setInterval cleared");
+        }
+    }, 200);
+}
+
+function setupReceiptPage(ballotReceiptObject) {
+    // For now store the (global) GUID
+    vote_store_id = ballotReceiptObject.vote_store_id;
+
+    // Clear out the completed blank ballot
+    nullifyVotingSession();
+
+    // Clear out progressBar and progressBar stylesheet - remove everything
+    const progressBar = document.getElementById("progressBar");
+    progressBar.replaceChildren();
+    progressBar.style.backgroundColor = "transparent";
+
+    // Clear out youAreHereBar
+    document.getElementById("youAreHereBar").replaceChildren();
+
+    // Clear all all three sections
+    const upperSection = document.getElementById("upperSection");
+    const lowerSection = document.getElementById("lowerSection");
+    upperSection.replaceChildren();
+    lowerSection.replaceChildren();
+    document.getElementById("bottomSection").replaceChildren();
+
+    // Add upper text
+    const upperSpan = document.createElement("span");
+    upperSpan.innerHTML = `<h2>This is a ballot check</h2>
+<ul>
+<li>Clicking a contest digest will display that contest</li>
+<li>Clicking the row index will validate that row of contests</li>
+<li>Clicking the column header will tally that contest</li>
+</ul>
+<table><tr><th>
+<h2>Your row number is: <span id="tofade" class="visible"><span id="rowIndex">null</span></span></h2></th><th>&nbsp&nbsp(disappears in 5 seconds)</th></tr></table>`;
+    upperSection.appendChild(upperSpan);
+
+    if (ballotReceiptObject.encoded_qr) {
+        // get the svg text and wrap it in an anchor tag
+        let qrElement = document.createElement("div");
+        let qrLink = document.createElement("div");
+        let decodedQR = atob(ballotReceiptObject.encoded_qr);
+        let qrSvg = decodedQR.substring(decodedQR.indexOf("\n") + 1);
+        // ZZZ - 2024/04/18: the QR code is coming up blank.  One thought
+        // is that the color has not been set to black TBD.
+        qrSvg = '<svg fill="currentColor" color="black" ' + qrSvg.substring(5);
+        // Create an explicit link to the show-commit.html page
+        qrElement.innerHTML = qrSvg;
+        qrLink.innerHTML = `<a target="_blank" href="show-versioned-receipt.html?vote_store_id=${vote_store_id}&digest=${ballotReceiptObject.receipt_digest}">Click me</a>`;
+        upperSpan.appendChild(qrElement);
+        upperSpan.appendChild(qrLink)
+    }
+
+    // Create the table (this creates the receipt DOM)
+    createReceiptTable(ballotReceiptObject, vote_store_id);
+
+    // Set the row number
+    document.getElementById("rowIndex").innerText = ballotReceiptObject.ballot_row;
+
+    // Fade the row number
+    fadeOut(ballotReceiptObject, document.getElementById("rowIndex"));
+}
+
+// ################
+// __main__
+// ################
+function main(incomingBB) {
+    // No javascript classes here - set these three globals:
+    blankBallot = incomingBB;
+    listOfContests = incomingBB.contests;
+    numberOfContests = incomingBB.contests.length;
+    console.log("there are " + numberOfContests + " contest(s)");
+    // When we are here, we are about to set up the first contest.
+    // set up the bars once
+    setupProgressBars(numberOfContests);
+    // set up the first contest
+    setupNewContest(0);
+}
+
+// To mock or not to mock
+if (MOCK_WEBAPI) {
+    try {
+        console.log("parsing mock blank ballot");
+        const incoming = JSON.parse(blankBallotJSON);
+    } catch (e) {
+        console.error(e);
+    }
+    main(incoming);
+} else {
+    console.log("fetching a live blank ballot");
+    // Need the JSON data for just about everything.  However, the way to get
+    // external json is with a fetch, which is asynchronous.  Which means that
+    // 'just about everything' on this page needs to run within the callback to
+    // the async function (called only when !MOCK_WEBAPI).
+    fetch(getBlankBallotURL)
+        .then(response => response.json())
+        .then(json => {
+            // Access json only inside the `then`
+            if (json.webapi_error) {
+                throw new Error(json.webapi_error);
+            }
+            console.log("retrieved the live blank ballot");
+            main(json.blank_ballot);
+        })
+        .catch(error => console.log("blank ballot fetch returned an error: " + error));
+}

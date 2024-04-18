@@ -53,22 +53,47 @@ That specific ballot receipt is displayed.  If voting, the voter's row offset in
   - each row heading is clickable - takes the user to that verify-ballot-check.html page
   - each column heading is clickable - takes the user to that tally-election.html page (no digest tracking)
   
-See ProjectPlan.md - receipt.html
+Note - this is handled by the voting.html page.  The act of voting generates a vote\_store_id which is then required for further interactions by the end user/voter.
 
 ## User Story 4 - inspecting contest CVRs
 
 #### What happens when the user wants to inspect a specific contest CVR?
 
-TBD - see ProjectPlan.md - contest-cvr.html
+TBD - see ProjectPlan.md - show-contest.html
 
 ## User Story 5 - verifying the ballot check
 
 #### What happens when the user wants to verify their ballot check?
 
-TBD - see ProjectPlan.md - verify-ballot-check.html
+TBD - see ProjectPlan.md - verify-ballot-row.html
 
 ## User Story 6 - tallying the election
 
 #### What happens when the user wants to tally the election?
 
-TBD - see ProjectPlan.md - tally-election.html
+TBD - see ProjectPlan.md - tally-contests.html
+
+## General client <-> web-api <-> backend spring demo #2 data flow
+
+1. user lands on welcome page: http://127.0.0.1/index.html 
+ - served as a static uvicorn page
+ - clicks a button which:
+   - optionally passes the address as a parameter
+   - goes to http://127.0.0.1/voting.html (in the existing tab)
+2. user lands on http://127.0.0.1/voting.html
+ - served as a static uvicorn page
+ - reads an optional address parameter
+ - will fetch a (possibly address specific) blank ballot via http://127.0.0.1/get\_blank_ballot endpoint
+   - this endpoint is altered so to not require a vote\_store_id GUID (note - the GUID workspace is not created until the ballot is cast)
+ - completely handles the voting process by changing the DOM, not by loading/reloading a new page
+ - if voter spoils ballot, voter returns to index.html (in same tab)
+ - if casts ballot, calls the http://127.0.0.1/cast-ballot endpoint supplying cast_ballot json
+   - this (existing) endpoint is altered so that it:
+     - creates the vote\_store_id GUID first
+     - then calls the backend to cast the ballot
+     - if successful returns the GUID and the receipt
+ - note - voting.js also handles displaying the receipt by re-writing the DOM
+3. while viewing the receipt contest (via voting.html), user can click to create new tabs for contest-cvr, verify, and tally
+4. contest-cvr - http://127.0.0.1/show-contest.index?GUID (with endpoints having the GUID embedded in the path)
+5. verify-ballot - http://127.0.0.1/verify-ballot-row.html?GUID
+6. tally-contest - http://127.0.0.1/tally-contests.html?GUID
