@@ -1,5 +1,5 @@
 // Used exclusively for User Story #5 - verify-ballot.html
-const verifyBallotRowURL =  "http://127.0.0.1:8000/web-api/verify_ballot_row";
+const verifyBallotRowURL =  window.location.origin + "/web-api/verify_ballot_row";
 
 // Display the git log with the necessay links
 function displayStdout(vote_store_id, stdoutTextArray, digestURL, tallyURL) {

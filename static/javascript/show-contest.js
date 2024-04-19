@@ -1,5 +1,5 @@
 // Used exclusively for User Story #4 - contest-cvr.html
-const showContestURL =  "http://127.0.0.1:8000/web-api/show_contest";
+const showContestURL =  window.location.origin + "/web-api/show_contest";
 
 // Display the git log with the necessay links
 function displayLog(vote_store_id, git_log, digestURL) {

@@ -1,5 +1,5 @@
 // Used exclusively for User Story #4 - contest-cvr.html
-const showContestURL =  "http://127.0.0.1:8000/web-api/show_versioned_receipt";
+const showContestURL =  window.location.origin + "/web-api/show_versioned_receipt";
 
 // To mock or not to mock
 if (MOCK_WEBAPI) {

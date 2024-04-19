@@ -18,8 +18,8 @@ var vote_store_id = null;
 // Various constants
 const selectBackgroundColor = "#f5f5f5";
 const extraSpace = "&nbsp&nbsp";
-const getBlankBallotURL =  "http://127.0.0.1:8000/web-api/get_blank_ballot";
-const castBallotURL =  "http://127.0.0.1:8000/web-api/cast_ballot";
+const getBlankBallotURL = window.location.origin + "/web-api/get_blank_ballot";
+const castBallotURL = window.location.origin + "/web-api/cast_ballot";
 
 // Define a YouAreThere inline glyph
 const yrhIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
