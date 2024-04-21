@@ -482,9 +482,10 @@ function setupVoteButtonListener(buttonString, rootElement) {
     const newButton = document.createElement("button");
     newButton.innerText = buttonString;
     // add an event listener to the button
-    newButton.addEventListener("click", function (e) {
-        console.log("Running '" + buttonString + "' eventListener");
-        if (buttonString == "VOTE") {
+    console.log("Running '" + buttonString + "' eventListener");
+    if (buttonString == "VOTE") {
+        // event listener to cast a ballot
+        newButton.addEventListener("click", function (e) {
             if (MOCK_WEBAPI) {
                 try {
                     console.log("parsing mock blank receipt");
@@ -516,7 +517,16 @@ function setupVoteButtonListener(buttonString, rootElement) {
                     })
                     .catch(error => console.log("ballot POST returned an error: " + error));
             }
-        } else if (buttonString == "Spoil Ballot") {
+        });
+        // Change the text on click
+        newButton.addEventListener("click", ({ target: button }) => {
+            button.insertAdjacentText("afterend", "Casting Ballot ...");
+            button.remove();
+        }, false);
+        return newButton;
+    } else if (buttonString == "Spoil Ballot") {
+        // Spoil button
+        newButton.addEventListener("click", function (e) {
             // For now, just print something, destroy the blankBallot,
             // and go to home page
             nullifyVotingSession();
@@ -530,11 +540,12 @@ function setupVoteButtonListener(buttonString, rootElement) {
                 window.location.href = "index.html";
             };
             rootElement.appendChild(startOverButton);
-        } else {
-            alert("Unsupported/unimplemented function '" + buttonString + "'");
-        }
-    });
-    return newButton;
+        });
+        return newButton;
+    } else {
+        alert("Unsupported/unimplemented function '" + buttonString + "'");
+    }
+    return null;
 }
 
 // Setup the progressBar navigation buttons.  Design note - as the
