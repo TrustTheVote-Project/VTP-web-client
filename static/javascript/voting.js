@@ -841,6 +841,9 @@ function setupReceiptPage(ballotReceiptObject) {
     // Create the table (this creates the receipt DOM)
     createReceiptTable(ballotReceiptObject, vote_store_id);
 
+    // Force scroll to the top
+    window.scrollTo(0, 0);
+
     // Set the row number
     document.getElementById("rowIndex").innerText = ballotReceiptObject.ballot_row;
 
@@ -863,10 +866,6 @@ function main(incomingBB) {
     // set up the first contest
     setupNewContest(0);
 }
-
-// Note - then this page reloads to display the receipt, reposition
-// the window back to the top of the content
-document.body.scrollTop = document.documentElement.scrollTop = 0;
 
 // To mock or not to mock
 if (MOCK_WEBAPI) {
