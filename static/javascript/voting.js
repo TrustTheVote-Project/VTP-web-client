@@ -436,6 +436,32 @@ function setupNavigationButtonListener(buttonString, thisContestNum, thisContest
     return newButton;
 }
 
+// May need this to add return/enter key event handling:
+// Remove any document 'onkeydown' event listeners
+// function testForRemovalEventListener(element, event) {
+//     const eventListeners = getEventListeners(element);
+//     for (const eventListener of eventListeners) {
+//         if (eventListener.type === event) {
+//             return true;
+//         }
+//     }
+//     return false;
+// }
+// function addOnKeyDownEventListener () {
+//     document.onkeydown = function (e) {
+//         // support older browsers (is this needed anymore?)
+//         e = e || window.event;
+//         // ditto?
+//         switch (e.which || e.keyCode) {
+//             case 13: // ASCII code for 'Enter'
+//             // Either go to next contest/checkout or do nothing
+//             // ZZZ code
+//             // Safely/quickly break otherwise
+//             break;
+//         };
+//     }
+// }
+
 // Setup the bottom navigation buttons
 function setupBottomNavigation(thisContestNum, nextContestNum, thisContestValue) {
     const bottomElement = document.getElementById("bottomSection");
