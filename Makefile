@@ -35,4 +35,5 @@ default:
 # emacs tags (for javascript need GNU's universal-ctags package)
 .PHONY: etags
 etags:
-	/opt/homebrew/bin/ctags -e -R --language-force=javascript
+#	/opt/homebrew/bin/ctags -e -R --language-force=javascript
+	/opt/homebrew/bin/ctags -e -R

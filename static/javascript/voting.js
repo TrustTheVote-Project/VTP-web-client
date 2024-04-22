@@ -6,6 +6,7 @@
 var choiceList = null;
 var sortableList = null;
 var removeButtons = null;
+var keydownEL = false;
 // Don't know how to implement a closure or equivilent yet - this is a global
 // to store how many choices have been so far selected in a RCV contest.
 var selectedCount = 0;
@@ -387,80 +388,58 @@ function setupNavigationButtonListener(buttonString, thisContestNum, thisContest
     const newButton = document.createElement("button");
     newButton.innerText = buttonString;
     // add an event listener to the button
-    newButton.addEventListener("click", function (e) {
-        console.log("Running NextButton '" + buttonString + "' eventListener for contest " + nextContestNum);
-        // On the button click go to the next contest or the checkout screen
-        //
-        // Going to the next contest involves:
-        // 1) capturing the vote (a.k.a. thisContest's selections) before it
-        //    (probably?) gets wiped out when the DOM children are reaped.
-        //    thisContestValue is a reference into the blankBallot object.
-        if (thisContestValue) {
-            const selection = [];
-            let index = 0;
-            for (const choice of document.getElementsByClassName("selected")) {
-                const name = choice.children[1].innerText.trim();
-                selection[index] = index + ": " + name;
-                console.log("recording vote: " + index + ": " + name);
-                index += 1;
-            }
-            thisContestValue["selection"] = selection;
-            // and setting the progressBar color
-            let max = thisContestValue.max_selections;
-            if (!max) {
-                max = thisContestValue.choices.length;
-            }
-            console.log("");
-            if (selection.length == 0) {
-                console.log("Contest " + thisContestNum + " no voted");
-                setProgressBarColor(thisContestNum, "novotedBG");
-            } else if (max == selection.length) {
-                console.log("Contest " + thisContestNum + " voted");
-                setProgressBarColor(thisContestNum, "votedBG");
-            } else {
-                console.log("Contest " + thisContestNum + " undervoted voted");
-                setProgressBarColor(thisContestNum, "undervotedBG");
-            }
-        }
-        // 2) clearing out the upper and lower node DOM trees
-        document.getElementById("upperSection").replaceChildren();
-        document.getElementById("lowerSection").replaceChildren();
-        document.getElementById("bottomSection").replaceChildren();
-        // 3) Going somewhere
-        if (nextContestNum < numberOfContests) {
-            setupNewContest(nextContestNum);
-        } else {
-            setupCheckout();
-        }
+    newButton.addEventListener("click", function() {
+        createNewPage(buttonString, thisContestNum, thisContestValue, nextContestNum);
     });
     return newButton;
 }
 
-// May need this to add return/enter key event handling:
-// Remove any document 'onkeydown' event listeners
-// function testForRemovalEventListener(element, event) {
-//     const eventListeners = getEventListeners(element);
-//     for (const eventListener of eventListeners) {
-//         if (eventListener.type === event) {
-//             return true;
-//         }
-//     }
-//     return false;
-// }
-// function addOnKeyDownEventListener () {
-//     document.onkeydown = function (e) {
-//         // support older browsers (is this needed anymore?)
-//         e = e || window.event;
-//         // ditto?
-//         switch (e.which || e.keyCode) {
-//             case 13: // ASCII code for 'Enter'
-//             // Either go to next contest/checkout or do nothing
-//             // ZZZ code
-//             // Safely/quickly break otherwise
-//             break;
-//         };
-//     }
-// }
+function createNewPage (eventName, thisContestNum, thisContestValue, nextContestNum) {
+    console.log("Running next navigation event listerner (" + eventName + ") for contest " + nextContestNum);
+    // On the button click go to the next contest or the checkout screen
+    //
+    // Going to the next contest involves:
+    // 1) capturing the vote (a.k.a. thisContest's selections) before it
+    //    (probably?) gets wiped out when the DOM children are reaped.
+    //    thisContestValue is a reference into the blankBallot object.
+    if (thisContestValue) {
+        const selection = [];
+        let index = 0;
+        for (const choice of document.getElementsByClassName("selected")) {
+            const name = choice.children[1].innerText.trim();
+            selection[index] = index + ": " + name;
+            console.log("recording vote: " + index + ": " + name);
+            index += 1;
+        }
+        thisContestValue["selection"] = selection;
+        // and setting the progressBar color
+        let max = thisContestValue.max_selections;
+        if (!max) {
+            max = thisContestValue.choices.length;
+        }
+        console.log("");
+        if (selection.length == 0) {
+            console.log("Contest " + thisContestNum + " no voted");
+            setProgressBarColor(thisContestNum, "novotedBG");
+        } else if (max == selection.length) {
+            console.log("Contest " + thisContestNum + " voted");
+            setProgressBarColor(thisContestNum, "votedBG");
+        } else {
+            console.log("Contest " + thisContestNum + " undervoted voted");
+            setProgressBarColor(thisContestNum, "undervotedBG");
+        }
+    }
+    // 2) clearing out the upper and lower node DOM trees
+    document.getElementById("upperSection").replaceChildren();
+    document.getElementById("lowerSection").replaceChildren();
+    document.getElementById("bottomSection").replaceChildren();
+    // 3) going somewhere
+    if (nextContestNum < numberOfContests) {
+        setupNewContest(nextContestNum);
+    } else {
+        setupCheckout();
+    }
+}
 
 // Setup the bottom navigation buttons
 function setupBottomNavigation(thisContestNum, nextContestNum, thisContestValue) {
@@ -791,8 +770,23 @@ function setupNewContest(thisContestNum) {
     // navigation.  Note - the voter's selection is saved when navigating away
     // from the page - hence it needs _this_ thisContestValue.
     setupBottomNavigation(thisContestNum, thisContestNum + 1, thisContestValue);
+
     // Setup progressBar navigation
     setupProgressBarNavigation(thisContestNum, thisContestValue);
+
+    // Setup keyboard listener if it does not already exist
+    // if (keydownEL && thisContestNum + 1 >= numberOfContests) {
+    //     // remove it when on the last page (checkout)
+    //     document.removeEventListener("keydown", createNewPage);
+    //     keydownEL = false;
+    // } else if (! keydownEL && thisContestNum + 1 < numberOfContests) {
+    //     // Create one
+    //     document.addEventListener("keydown", function(event) {
+    //         if (event.key === "Enter") {
+    //             createNewPage("Enter keydown", thisContestNum, thisContestValue, thisContestNum + 1);
+    //         }
+    //     });
+    // }
 }
 
 // Create a function to fade out the element
@@ -850,15 +844,21 @@ function setupReceiptPage(ballotReceiptObject) {
 
     if (ballotReceiptObject.encoded_qr) {
         // get the svg text and wrap it in an anchor tag
-        let qrElement = document.createElement("div");
-        let qrLink = document.createElement("div");
-        let decodedQR = atob(ballotReceiptObject.encoded_qr);
+        const decodedQR = atob(ballotReceiptObject.encoded_qr);
+        const qrElement = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        qrElement.setAttribute("width", "49mm");
+        qrElement.setAttribute("height", "49mm");
+        qrElement.setAttribute("viewBox", "0 0 185 185");
+        qrElement.setAttribute("fill", "currentColor");
+        qrElement.setAttribute("color", "black");
         let qrSvg = decodedQR.substring(decodedQR.indexOf("\n") + 1);
         // ZZZ - 2024/04/18: the QR code is coming up blank.  One thought
-        // is that the color has not been set to black TBD.
-        qrSvg = '<svg fill="currentColor" color="black" ' + qrSvg.substring(5);
-        // Create an explicit link to the show-commit.html page
-        qrElement.innerHTML = qrSvg;
+        // is that when not using a createElementNS something somewhere thinks
+        // the canvas is now tainted and sets the RGB values to 0,0,0.  So,
+        // hackito ergo sum the pertinent contents of qrSvg into qrElement:
+        qrElement.innerHTML = qrSvg.slice(qrSvg.indexOf("<svg:rect "));
+        // Create an explicit link as well
+        let qrLink = document.createElement("div");
         qrLink.innerHTML = `<a target="_blank" href="show-versioned-receipt.html?vote_store_id=${vote_store_id}&digest=${ballotReceiptObject.receipt_digest}">Click me</a>`;
         upperSpan.appendChild(qrElement);
         upperSpan.appendChild(qrLink)
