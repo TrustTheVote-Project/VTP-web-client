@@ -360,6 +360,18 @@ function setupPluralityEventListeners(thisContestName, thisContestValue) {
                 listItem.firstElementChild.style.fill = "black"
                 selectedCount++;
                 console.log("selected " + itemIndex + ", " + itemText);
+            } else if (thisContestValue.max_selections == 1) {
+                // Ease of use - deselect previous choice and select this one
+                for (const selected of document.getElementsByClassName("selected")) {
+                    selected.classList.add("unselected");
+                    selected.classList.remove("selected");
+                    selected.firstElementChild.style.fill = selectBackgroundColor;
+                }
+                listItem.classList.add("selected");
+                listItem.classList.remove("unselected");
+                // get the svg (first child) and set fill to on (black)
+                listItem.firstElementChild.style.fill = "black"
+                console.log("switched selection to " + itemIndex + ", " + itemText);
             } else {
                 // Overvote
                 console.log("rejected (overvote) - ignoring " + itemIndex + ", " + itemText);
