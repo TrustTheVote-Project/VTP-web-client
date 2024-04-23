@@ -541,7 +541,7 @@ function setupVoteButtonListener(buttonString, rootElement) {
             button.remove();
         }, false);
         return newButton;
-    } else if (buttonString == "Spoil Ballot") {
+    } else {
         // Spoil button
         newButton.addEventListener("click", function (e) {
             // For now, just print something, destroy the blankBallot,
@@ -559,9 +559,9 @@ function setupVoteButtonListener(buttonString, rootElement) {
             rootElement.appendChild(startOverButton);
         });
         return newButton;
-    } else {
-        alert("Unsupported/unimplemented function '" + buttonString + "'");
     }
+    // } else {
+    //     alert("Unsupported/unimplemented function '" + buttonString + "'");
     return null;
 }
 
@@ -702,7 +702,7 @@ function setupCheckout() {
     //    - when integrated with the web-api, will send the modified
     //      blankBallot.json which will re-verify the ballot and
     //      casts it, returning the ballot receipt and row number
-    const spoilButton = setupVoteButtonListener("Spoil Ballot", rootElement);
+    const spoilButton = setupVoteButtonListener("Spoil Ballot (start over)", rootElement);
     const voteButton = setupVoteButtonListener("VOTE", rootElement);
     // Create the table and add them
     const voteTable = document.createElement("table");
