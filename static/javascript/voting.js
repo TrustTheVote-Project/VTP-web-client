@@ -832,14 +832,15 @@ function setupReceiptPage(ballotReceiptObject) {
 
     // Add upper text
     const upperSpan = document.createElement("span");
-    upperSpan.innerHTML = `<h2>This is a ballot check</h2>
+    upperSpan.innerHTML = `<h3>This is a ballot check</h3>
 <ul>
 <li>Clicking a contest digest will display that contest</li>
 <li>Clicking the row index will validate that row of contests</li>
 <li>Clicking the column header will tally that contest</li>
+<li>Clicking the QR code will display the saved ballot check</li>
 </ul>
-<table><tr><th>
-<h2>Your row number is: <span id="tofade" class="visible"><span id="rowIndex">null</span></span></h2></th><th>&nbsp&nbsp(disappears in 5 seconds)</th></tr></table>`;
+<table><tr><td>
+<h3>Your row number is: <span id="tofade" class="visible"><span id="rowIndex">null</span></span></h3></td><td>&nbsp&nbsp(disappears in 5 seconds)</td></tr></table>`;
     upperSection.appendChild(upperSpan);
 
     if (ballotReceiptObject.encoded_qr) {
@@ -849,18 +850,21 @@ function setupReceiptPage(ballotReceiptObject) {
         qrElement.setAttribute("width", "49mm");
         qrElement.setAttribute("height", "49mm");
         qrElement.setAttribute("viewBox", "0 0 185 185");
-        qrElement.setAttribute("fill", "currentColor");
-        qrElement.setAttribute("color", "black");
+        qrElement.setAttribute("fill", "black");
+        // add the xlink namespace (for making a href link)
+        qrElement.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
         let qrSvg = decodedQR.substring(decodedQR.indexOf("\n") + 1);
-        // ZZZ - 2024/04/18: the QR code is coming up blank.  One thought
-        // is that when not using a createElementNS something somewhere thinks
-        // the canvas is now tainted and sets the RGB values to 0,0,0.  So,
-        // hackito ergo sum the pertinent contents of qrSvg into qrElement:
-        qrElement.innerHTML = qrSvg.slice(qrSvg.indexOf("<svg:rect "));
-        // Create an explicit link as well
-        let qrLink = document.createElement("div");
-        qrLink.innerHTML = `<a target="_blank" href="show-versioned-receipt.html?vote_store_id=${vote_store_id}&digest=${ballotReceiptObject.receipt_digest}">Click me</a>`;
-        upperSpan.appendChild(qrElement);
+        // ZZZ - 2024/04/18: the QR code is coming up blank and not sure
+        // why.  Maybe because the python generated standalone svg is in
+        // xml syntax and this html doc needs it to be html syntax and
+        // they are different in this way?
+        qrElement.innerHTML = qrSvg.slice(qrSvg.indexOf("<svg:rect ")).replace(/svg:rect/g, "rect");
+        // Create an explicit link
+        const qrLink = document.createElement("a");
+        qrLink.appendChild(qrElement);
+        qrLink.setAttribute("target", "_blank");
+        qrLink.title = "QR link to ballot check";
+        qrLink.href = `show-versioned-receipt.html?vote_store_id=${vote_store_id}&digest=${ballotReceiptObject.receipt_digest}`;
         upperSpan.appendChild(qrLink)
     }
 
