@@ -215,15 +215,27 @@ function setupChoiceList(thisContestName, thisContestValue, overrideChoice=null)
 }
 
 // Make the RCV selection sortable by drag-and-drop
-// Note - the class is on the li node
+// Notes:
+// - the class is on the li node
+// - the initSortableList and associated css entries are from:
+//   https://code-boxx.com/drag-drop-sortable-list-javascript/
+//   with a MIT License
+// - the touchscreen mobile support (/static/javascript/DragDropTouch.js)
+//   is from: https://github.com/Bernardo-Castilho/dragdroptouch
+//   commit: 415fcf577d39bfac042d9215a02660d5c1df2f10
+//   also with a MIT License
 function initSortableList(target) {
+    // (A) SET CSS + GET ALL LIST ITEMS
     target.classList.add("slist");
     const items = target.getElementsByTagName("li");
     let current = null;
 
+    // (B) MAKE ITEMS DRAGGABLE + SORTABLE
     for (let i of items) {
+        // (B1) ATTACH DRAGGABLE
         i.draggable = true;
 
+        // (B2) DRAG START - YELLOW HIGHLIGHT DROPZONES
         i.ondragstart = (e) => {
             current = i;
             for (let it of items) {
@@ -233,16 +245,19 @@ function initSortableList(target) {
             }
         };
 
+        // (B3) DRAG ENTER - RED HIGHLIGHT DROPZONE
         i.ondragenter = (e) => {
             if (i != current) {
                 i.classList.add("active");
             }
         };
 
+        // (B4) DRAG LEAVE - REMOVE RED HIGHLIGHT
         i.ondragleave = (e) => {
             i.classList.remove("active");
         };
 
+        // (B5) DRAG END - REMOVE ALL HIGHLIGHTS
         i.ondragend = (e) => {
             for (let it of items) {
                 it.classList.remove("hint");
@@ -250,8 +265,10 @@ function initSortableList(target) {
             }
         };
 
+        // (B6) DRAG OVER - PREVENT THE DEFAULT "DROP", SO WE CAN DO OUR OWN
         i.ondragover = (e) => e.preventDefault();
 
+        // (B7) ON DROP - DO SOMETHING
         i.ondrop = (e) => {
             if (i != current) {
                 let currentPos = 0;
