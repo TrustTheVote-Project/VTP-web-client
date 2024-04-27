@@ -837,6 +837,21 @@ function fadeOut(receiptObject, fade) {
     }, 200);
 }
 
+// DragDropTouch Notes:
+// It turns out that when the DragDropTouch.js was added and the ballot receipt
+// is displayed, all the 'li' items appear to get the same DDT functionality added,
+// resulting in a poor UX (the li items are dragable via a touch screen).
+// There does not appear to be a way to list the event listeners (outside
+// of say chrome's devtools) since W3C apparently dropped that spec from
+// the 3 DOM specification.
+//
+// So it seems like the two remaining reasonable solutions are to 1) shift
+// the RCV sortableList from being "li" element based to being a custom
+// css class which is attached to those li elements of interest (create
+// a "DragDropTouch" class), but not sure if the DDT js blindly attaches
+// the EV's to all 'li's or just the classed ones.  Or 2) when setupReceiptPage
+// loads, explicitly remove the four event listeners that DragDropTouch adds.
+// For now, picked 2.  TBD
 function setupReceiptPage(ballotReceiptObject) {
     // For now store the (global) GUID
     vote_store_id = ballotReceiptObject.vote_store_id;
@@ -858,6 +873,12 @@ function setupReceiptPage(ballotReceiptObject) {
     upperSection.replaceChildren();
     lowerSection.replaceChildren();
     document.getElementById("bottomSection").replaceChildren();
+
+    // Clear the touchscreen event handlers if present
+    for (const ev in DDTEventListeners) {
+        document.removeEventListener(ev, DDTEventListeners[ev]);
+        console.log(`Removed eventlistener ${ev}`);
+    }
 
     // Add upper text
     const upperSpan = document.createElement("span");

@@ -1,3 +1,6 @@
+// Track the eventlisteners so they can later be removed
+const DDTEventListeners = {};
+
 let DragDropTouch;
 (function (DragDropTouch_1) {
     'use strict';
@@ -162,6 +165,10 @@ let DragDropTouch;
                 d.addEventListener('touchmove', tm, opt);
                 d.addEventListener('touchend', te);
                 d.addEventListener('touchcancel', te);
+                DDTEventListeners['touchstart'] = ts;
+                DDTEventListeners['touchmove'] = tm;
+                DDTEventListeners['touchend'] = te;
+                DDTEventListeners['touchcancel'] = te;
             }
         }
         /**
