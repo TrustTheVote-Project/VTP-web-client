@@ -25,8 +25,8 @@ else
 endif
 
 # Let there be no default target
-.PHONY: default
-default:
+.PHONY: help
+help:
 	@echo "${RED}There is no default make target.${END}  Specify one of:"
 	@echo "etags                   - constructs an emacs tags table"
 	@echo ""
@@ -35,4 +35,5 @@ default:
 # emacs tags (for javascript need GNU's universal-ctags package)
 .PHONY: etags
 etags:
-	/opt/homebrew/bin/ctags -e -R --language-force=javascript
+#	/opt/homebrew/bin/ctags -e -R --language-force=javascript
+	/opt/homebrew/bin/ctags -e -R

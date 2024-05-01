@@ -6,6 +6,7 @@
 var choiceList = null;
 var sortableList = null;
 var removeButtons = null;
+var keydownEL = false;
 // Don't know how to implement a closure or equivilent yet - this is a global
 // to store how many choices have been so far selected in a RCV contest.
 var selectedCount = 0;
@@ -18,8 +19,8 @@ var vote_store_id = null;
 // Various constants
 const selectBackgroundColor = "#f5f5f5";
 const extraSpace = "&nbsp&nbsp";
-const getBlankBallotURL =  "http://127.0.0.1:8000/web-api/get_blank_ballot";
-const castBallotURL =  "http://127.0.0.1:8000/web-api/cast_ballot";
+const getBlankBallotURL = window.location.origin + "/web-api/get_blank_ballot";
+const castBallotURL = window.location.origin + "/web-api/cast_ballot";
 
 // Define a YouAreThere inline glyph
 const yrhIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -214,15 +215,27 @@ function setupChoiceList(thisContestName, thisContestValue, overrideChoice=null)
 }
 
 // Make the RCV selection sortable by drag-and-drop
-// Note - the class is on the li node
+// Notes:
+// - the class is on the li node
+// - the initSortableList and associated css entries are from:
+//   https://code-boxx.com/drag-drop-sortable-list-javascript/
+//   with a MIT License
+// - the touchscreen mobile support (/static/javascript/DragDropTouch.js)
+//   is from: https://github.com/Bernardo-Castilho/dragdroptouch
+//   commit: 415fcf577d39bfac042d9215a02660d5c1df2f10
+//   also with a MIT License
 function initSortableList(target) {
+    // (A) SET CSS + GET ALL LIST ITEMS
     target.classList.add("slist");
     const items = target.getElementsByTagName("li");
     let current = null;
 
+    // (B) MAKE ITEMS DRAGGABLE + SORTABLE
     for (let i of items) {
+        // (B1) ATTACH DRAGGABLE
         i.draggable = true;
 
+        // (B2) DRAG START - YELLOW HIGHLIGHT DROPZONES
         i.ondragstart = (e) => {
             current = i;
             for (let it of items) {
@@ -232,16 +245,19 @@ function initSortableList(target) {
             }
         };
 
+        // (B3) DRAG ENTER - RED HIGHLIGHT DROPZONE
         i.ondragenter = (e) => {
             if (i != current) {
                 i.classList.add("active");
             }
         };
 
+        // (B4) DRAG LEAVE - REMOVE RED HIGHLIGHT
         i.ondragleave = (e) => {
             i.classList.remove("active");
         };
 
+        // (B5) DRAG END - REMOVE ALL HIGHLIGHTS
         i.ondragend = (e) => {
             for (let it of items) {
                 it.classList.remove("hint");
@@ -249,8 +265,10 @@ function initSortableList(target) {
             }
         };
 
+        // (B6) DRAG OVER - PREVENT THE DEFAULT "DROP", SO WE CAN DO OUR OWN
         i.ondragover = (e) => e.preventDefault();
 
+        // (B7) ON DROP - DO SOMETHING
         i.ondrop = (e) => {
             if (i != current) {
                 let currentPos = 0;
@@ -359,6 +377,18 @@ function setupPluralityEventListeners(thisContestName, thisContestValue) {
                 listItem.firstElementChild.style.fill = "black"
                 selectedCount++;
                 console.log("selected " + itemIndex + ", " + itemText);
+            } else if (thisContestValue.max_selections == 1) {
+                // Ease of use - deselect previous choice and select this one
+                for (const selected of document.getElementsByClassName("selected")) {
+                    selected.classList.add("unselected");
+                    selected.classList.remove("selected");
+                    selected.firstElementChild.style.fill = selectBackgroundColor;
+                }
+                listItem.classList.add("selected");
+                listItem.classList.remove("unselected");
+                // get the svg (first child) and set fill to on (black)
+                listItem.firstElementChild.style.fill = "black"
+                console.log("switched selection to " + itemIndex + ", " + itemText);
             } else {
                 // Overvote
                 console.log("rejected (overvote) - ignoring " + itemIndex + ", " + itemText);
@@ -387,53 +417,57 @@ function setupNavigationButtonListener(buttonString, thisContestNum, thisContest
     const newButton = document.createElement("button");
     newButton.innerText = buttonString;
     // add an event listener to the button
-    newButton.addEventListener("click", function (e) {
-        console.log("Running NextButton '" + buttonString + "' eventListener for contest " + nextContestNum);
-        // On the button click go to the next contest or the checkout screen
-        //
-        // Going to the next contest involves:
-        // 1) capturing the vote (a.k.a. thisContest's selections) before it
-        //    (probably?) gets wiped out when the DOM children are reaped.
-        //    thisContestValue is a reference into the blankBallot object.
-        if (thisContestValue) {
-            const selection = [];
-            let index = 0;
-            for (const choice of document.getElementsByClassName("selected")) {
-                const name = choice.children[1].innerText.trim();
-                selection[index] = index + ": " + name;
-                console.log("recording vote: " + index + ": " + name);
-                index += 1;
-            }
-            thisContestValue["selection"] = selection;
-            // and setting the progressBar color
-            let max = thisContestValue.max_selections;
-            if (!max) {
-                max = thisContestValue.choices.length;
-            }
-            console.log("");
-            if (selection.length == 0) {
-                console.log("Contest " + thisContestNum + " no voted");
-                setProgressBarColor(thisContestNum, "novotedBG");
-            } else if (max == selection.length) {
-                console.log("Contest " + thisContestNum + " voted");
-                setProgressBarColor(thisContestNum, "votedBG");
-            } else {
-                console.log("Contest " + thisContestNum + " undervoted voted");
-                setProgressBarColor(thisContestNum, "undervotedBG");
-            }
-        }
-        // 2) clearing out the upper and lower node DOM trees
-        document.getElementById("upperSection").replaceChildren();
-        document.getElementById("lowerSection").replaceChildren();
-        document.getElementById("bottomSection").replaceChildren();
-        // 3) Going somewhere
-        if (nextContestNum < numberOfContests) {
-            setupNewContest(nextContestNum);
-        } else {
-            setupCheckout();
-        }
+    newButton.addEventListener("click", function() {
+        createNewPage(buttonString, thisContestNum, thisContestValue, nextContestNum);
     });
     return newButton;
+}
+
+function createNewPage (eventName, thisContestNum, thisContestValue, nextContestNum) {
+    console.log("Running next navigation event listerner (" + eventName + ") for contest " + nextContestNum);
+    // On the button click go to the next contest or the checkout screen
+    //
+    // Going to the next contest involves:
+    // 1) capturing the vote (a.k.a. thisContest's selections) before it
+    //    (probably?) gets wiped out when the DOM children are reaped.
+    //    thisContestValue is a reference into the blankBallot object.
+    if (thisContestValue) {
+        const selection = [];
+        let index = 0;
+        for (const choice of document.getElementsByClassName("selected")) {
+            const name = choice.children[1].innerText.trim();
+            selection[index] = index + ": " + name;
+            console.log("recording vote: " + index + ": " + name);
+            index += 1;
+        }
+        thisContestValue["selection"] = selection;
+        // and setting the progressBar color
+        let max = thisContestValue.max_selections;
+        if (!max) {
+            max = thisContestValue.choices.length;
+        }
+        console.log("");
+        if (selection.length == 0) {
+            console.log("Contest " + thisContestNum + " no voted");
+            setProgressBarColor(thisContestNum, "novotedBG");
+        } else if (max == selection.length) {
+            console.log("Contest " + thisContestNum + " voted");
+            setProgressBarColor(thisContestNum, "votedBG");
+        } else {
+            console.log("Contest " + thisContestNum + " undervoted voted");
+            setProgressBarColor(thisContestNum, "undervotedBG");
+        }
+    }
+    // 2) clearing out the upper and lower node DOM trees
+    document.getElementById("upperSection").replaceChildren();
+    document.getElementById("lowerSection").replaceChildren();
+    document.getElementById("bottomSection").replaceChildren();
+    // 3) going somewhere
+    if (nextContestNum < numberOfContests) {
+        setupNewContest(nextContestNum);
+    } else {
+        setupCheckout();
+    }
 }
 
 // Setup the bottom navigation buttons
@@ -482,9 +516,10 @@ function setupVoteButtonListener(buttonString, rootElement) {
     const newButton = document.createElement("button");
     newButton.innerText = buttonString;
     // add an event listener to the button
-    newButton.addEventListener("click", function (e) {
-        console.log("Running '" + buttonString + "' eventListener");
-        if (buttonString == "VOTE") {
+    console.log("Running '" + buttonString + "' eventListener");
+    if (buttonString == "VOTE") {
+        // event listener to cast a ballot
+        newButton.addEventListener("click", function (e) {
             if (MOCK_WEBAPI) {
                 try {
                     console.log("parsing mock blank receipt");
@@ -516,7 +551,16 @@ function setupVoteButtonListener(buttonString, rootElement) {
                     })
                     .catch(error => console.log("ballot POST returned an error: " + error));
             }
-        } else if (buttonString == "Spoil Ballot") {
+        });
+        // Change the text on click
+        newButton.addEventListener("click", ({ target: button }) => {
+            button.insertAdjacentText("afterend", "Casting Ballot ...");
+            button.remove();
+        }, false);
+        return newButton;
+    } else {
+        // Spoil button
+        newButton.addEventListener("click", function (e) {
             // For now, just print something, destroy the blankBallot,
             // and go to home page
             nullifyVotingSession();
@@ -530,11 +574,12 @@ function setupVoteButtonListener(buttonString, rootElement) {
                 window.location.href = "index.html";
             };
             rootElement.appendChild(startOverButton);
-        } else {
-            alert("Unsupported/unimplemented function '" + buttonString + "'");
-        }
-    });
-    return newButton;
+        });
+        return newButton;
+    }
+    // } else {
+    //     alert("Unsupported/unimplemented function '" + buttonString + "'");
+    return null;
 }
 
 // Setup the progressBar navigation buttons.  Design note - as the
@@ -674,7 +719,7 @@ function setupCheckout() {
     //    - when integrated with the web-api, will send the modified
     //      blankBallot.json which will re-verify the ballot and
     //      casts it, returning the ballot receipt and row number
-    const spoilButton = setupVoteButtonListener("Spoil Ballot", rootElement);
+    const spoilButton = setupVoteButtonListener("Spoil Ballot (start over)", rootElement);
     const voteButton = setupVoteButtonListener("VOTE", rootElement);
     // Create the table and add them
     const voteTable = document.createElement("table");
@@ -754,8 +799,23 @@ function setupNewContest(thisContestNum) {
     // navigation.  Note - the voter's selection is saved when navigating away
     // from the page - hence it needs _this_ thisContestValue.
     setupBottomNavigation(thisContestNum, thisContestNum + 1, thisContestValue);
+
     // Setup progressBar navigation
     setupProgressBarNavigation(thisContestNum, thisContestValue);
+
+    // Setup keyboard listener if it does not already exist
+    // if (keydownEL && thisContestNum + 1 >= numberOfContests) {
+    //     // remove it when on the last page (checkout)
+    //     document.removeEventListener("keydown", createNewPage);
+    //     keydownEL = false;
+    // } else if (! keydownEL && thisContestNum + 1 < numberOfContests) {
+    //     // Create one
+    //     document.addEventListener("keydown", function(event) {
+    //         if (event.key === "Enter") {
+    //             createNewPage("Enter keydown", thisContestNum, thisContestValue, thisContestNum + 1);
+    //         }
+    //     });
+    // }
 }
 
 // Create a function to fade out the element
@@ -777,6 +837,21 @@ function fadeOut(receiptObject, fade) {
     }, 200);
 }
 
+// DragDropTouch Notes:
+// It turns out that when the DragDropTouch.js was added and the ballot receipt
+// is displayed, all the 'li' items appear to get the same DDT functionality added,
+// resulting in a poor UX (the li items are dragable via a touch screen).
+// There does not appear to be a way to list the event listeners (outside
+// of say chrome's devtools) since W3C apparently dropped that spec from
+// the 3 DOM specification.
+//
+// So it seems like the two remaining reasonable solutions are to 1) shift
+// the RCV sortableList from being "li" element based to being a custom
+// css class which is attached to those li elements of interest (create
+// a "DragDropTouch" class), but not sure if the DDT js blindly attaches
+// the EV's to all 'li's or just the classed ones.  Or 2) when setupReceiptPage
+// loads, explicitly remove the four event listeners that DragDropTouch adds.
+// For now, picked 2.  TBD
 function setupReceiptPage(ballotReceiptObject) {
     // For now store the (global) GUID
     vote_store_id = ballotReceiptObject.vote_store_id;
@@ -799,36 +874,55 @@ function setupReceiptPage(ballotReceiptObject) {
     lowerSection.replaceChildren();
     document.getElementById("bottomSection").replaceChildren();
 
+    // Clear the touchscreen event handlers if present
+    for (const ev in DDTEventListeners) {
+        document.removeEventListener(ev, DDTEventListeners[ev]);
+        console.log(`Removed eventlistener ${ev}`);
+    }
+
     // Add upper text
     const upperSpan = document.createElement("span");
-    upperSpan.innerHTML = `<h2>This is a ballot check</h2>
+    upperSpan.innerHTML = `<h3>This is a ballot check</h3>
 <ul>
 <li>Clicking a contest digest will display that contest</li>
 <li>Clicking the row index will validate that row of contests</li>
 <li>Clicking the column header will tally that contest</li>
+<li>Clicking the QR code will display the saved ballot check</li>
 </ul>
-<table><tr><th>
-<h2>Your row number is: <span id="tofade" class="visible"><span id="rowIndex">null</span></span></h2></th><th>&nbsp&nbsp(disappears in 5 seconds)</th></tr></table>`;
+<table><tr><td>
+<h3>Your row number is: <span id="tofade" class="visible"><span id="rowIndex">null</span></span></h3></td><td>&nbsp&nbsp(disappears in 5 seconds)</td></tr></table>`;
     upperSection.appendChild(upperSpan);
 
     if (ballotReceiptObject.encoded_qr) {
         // get the svg text and wrap it in an anchor tag
-        let qrElement = document.createElement("div");
-        let qrLink = document.createElement("div");
-        let decodedQR = atob(ballotReceiptObject.encoded_qr);
+        const decodedQR = atob(ballotReceiptObject.encoded_qr);
+        const qrElement = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+        qrElement.setAttribute("width", "49mm");
+        qrElement.setAttribute("height", "49mm");
+        qrElement.setAttribute("viewBox", "0 0 185 185");
+        qrElement.setAttribute("fill", "black");
+        // add the xlink namespace (for making a href link)
+        qrElement.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
         let qrSvg = decodedQR.substring(decodedQR.indexOf("\n") + 1);
-        // ZZZ - 2024/04/18: the QR code is coming up blank.  One thought
-        // is that the color has not been set to black TBD.
-        qrSvg = '<svg fill="currentColor" color="black" ' + qrSvg.substring(5);
-        // Create an explicit link to the show-commit.html page
-        qrElement.innerHTML = qrSvg;
-        qrLink.innerHTML = `<a target="_blank" href="show-versioned-receipt.html?vote_store_id=${vote_store_id}&digest=${ballotReceiptObject.receipt_digest}">Click me</a>`;
-        upperSpan.appendChild(qrElement);
+        // ZZZ - 2024/04/18: the QR code is coming up blank and not sure
+        // why.  Maybe because the python generated standalone svg is in
+        // xml syntax and this html doc needs it to be html syntax and
+        // they are different in this way?
+        qrElement.innerHTML = qrSvg.slice(qrSvg.indexOf("<svg:rect ")).replace(/svg:rect/g, "rect");
+        // Create an explicit link
+        const qrLink = document.createElement("a");
+        qrLink.appendChild(qrElement);
+        qrLink.setAttribute("target", "_blank");
+        qrLink.title = "QR link to ballot check";
+        qrLink.href = `show-versioned-receipt.html?vote_store_id=${vote_store_id}&digest=${ballotReceiptObject.receipt_digest}`;
         upperSpan.appendChild(qrLink)
     }
 
     // Create the table (this creates the receipt DOM)
     createReceiptTable(ballotReceiptObject, vote_store_id);
+
+    // Force scroll to the top
+    window.scrollTo(0, 0);
 
     // Set the row number
     document.getElementById("rowIndex").innerText = ballotReceiptObject.ballot_row;

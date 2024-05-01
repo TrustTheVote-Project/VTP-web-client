@@ -1,5 +1,5 @@
 // Used exclusively for User Story #6 - tally-contest.html
-const tallyContestsURL =  "http://127.0.0.1:8000/web-api/tally_contests";
+const tallyContestsURL =  window.location.origin + "/web-api/tally_contests";
 
 // Display the git log with the necessay links
 function displayStdout(vote_store_id, stdoutTextArray, digestURL, tallyURL) {
